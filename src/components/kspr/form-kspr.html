@@ -1,4 +1,4 @@
-<form action="#">
+<form id="screening_form">
     <div class="card text-start mt-3 bg-primary-subtle inner-shadow">
         <div class="card-body">
             <h5 class="card-title text-primary-emphasis">
@@ -71,7 +71,8 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">10. Pernah operasi sesar?</label>
+                <label class="form-label">10. Pernah operasi sesar? <span class="text-danger-emphasis"><i
+                            class="fa-solid fa-circle-exclamation"></i></span></label>
                 <div>
                     <input type="radio" class="btn-check" name="history_csection" value="ya" id="history_csection_ya"
                         autocomplete="off">
@@ -81,83 +82,75 @@
                     <label class="btn btn-outline-success" for="history_csection_tidak">Tidak</label>
                 </div>
             </div>
-            <div class="card mb-3 bg-light-subtle">
-                <div class="card-body">
-                    <label class="form-label">11. Pernah melahirkan dengan: (pilih semua yang
-                        sesuai)</label>
-                    <div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="delivery_complications" value="1" id="delivery_complications1">
-                            <label class="form-check-label" for="delivery_complications1">
-                                Tarikan tang/vakum
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="delivery_complications" value="2" id="delivery_complications2">
-                            <label class="form-check-label" for="delivery_complications2">
-                                Uri dirogoh
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="delivery_complications" value="3" id="delivery_complications3">
-                            <label class="form-check-label" for="delivery_complications3">
-                                Diberi infus/transfusi
-                            </label>
-                        </div>
-                    </div>
+            <label class="form-label">11. Pernah melahirkan dengan: (pilih semua yang
+                sesuai)</label>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="delivery_complications" value="1" id="delivery_complications1">
+                    <label class="form-check-label" for="delivery_complications1">
+                        Tarikan tang/vakum
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="delivery_complications" value="2" id="delivery_complications2">
+                    <label class="form-check-label" for="delivery_complications2">
+                        Uri dirogoh
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="delivery_complications" value="3" id="delivery_complications3">
+                    <label class="form-check-label" for="delivery_complications3">
+                        Diberi infus/transfusi
+                    </label>
                 </div>
             </div>
-            <div class="card mb-3 bg-light-subtle">
-                <div class="card-body">
-                    <label class="form-label">12. Penyakit pada ibu hamil: (pilih semua yang
-                        sesuai)</label>
-                    <div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="1" id="maternal_diseases1">
-                            <label class="form-check-label" for="maternal_diseases1">
-                                Kurang darah
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="2" id="maternal_diseases2">
-                            <label class="form-check-label" for="maternal_diseases2">
-                                Malaria
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="3" id="maternal_diseases3">
-                            <label class="form-check-label" for="maternal_diseases3">
-                                TBC paru
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="4" id="maternal_diseases4">
-                            <label class="form-check-label" for="maternal_diseases4">
-                                Payah jantung
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="5" id="maternal_diseases5">
-                            <label class="form-check-label" for="maternal_diseases5">
-                                Kencing manis (diabetes)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                                name="maternal_diseases" value="6" id="maternal_diseases6">
-                            <label class="form-check-label" for="maternal_diseases6">
-                                Penyakit Menular Seksual
-                            </label>
-                        </div>
-                    </div>
+            <label class="form-label">12. Penyakit pada ibu hamil: (pilih semua yang
+                sesuai)</label>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="1" id="maternal_diseases1">
+                    <label class="form-check-label" for="maternal_diseases1">
+                        Kurang darah
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="2" id="maternal_diseases2">
+                    <label class="form-check-label" for="maternal_diseases2">
+                        Malaria
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="3" id="maternal_diseases3">
+                    <label class="form-check-label" for="maternal_diseases3">
+                        TBC paru
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="4" id="maternal_diseases4">
+                    <label class="form-check-label" for="maternal_diseases4">
+                        Payah jantung
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="5" id="maternal_diseases5">
+                    <label class="form-check-label" for="maternal_diseases5">
+                        Kencing manis (diabetes)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="6" id="maternal_diseases6">
+                    <label class="form-check-label" for="maternal_diseases6">
+                        Penyakit Menular Seksual
+                    </label>
                 </div>
             </div>
         </div>
@@ -168,19 +161,13 @@
                 <i class="fa-solid fa-face-frown"></i>
                 Komplikasi Kehamilan Saat Ini
             </h5>
-            <div class="mb-3">
-                <label class="form-label">13. Bengkak pada muka/tungkai dan tekanan darah tinggi</label>
-                <div>
-                    <input type="radio" class="btn-check" name="preeclampsia_mild" value="ya" id="preeclampsia_mild_ya"
-                        autocomplete="off">
-                    <label class="btn btn-outline-danger" for="preeclampsia_mild_ya">Ya</label>
-                    <input type="radio" class="btn-check" name="preeclampsia_mild" value="tidak"
-                        id="preeclampsia_mild_tidak" autocomplete="off" checked>
-                    <label class="btn btn-outline-success" for="preeclampsia_mild_tidak">Tidak</label>
-                </div>
+            <div id="boolean_questions">
+                <!-- questions will be inserted here by script -->
             </div>
         </div>
     </div>
-    <div class="btn btn-success mt-3" style="width: 100%;">Skrining Sekarang!</div>
+    <button type="submit" class="btn btn-success mt-3 w-100">CEK SKOR</button>
+    <div id="result_area">
+        <!-- content will be generated by script -->
+    </div>
 </form>
-<hr />
