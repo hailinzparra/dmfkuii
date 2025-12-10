@@ -6,20 +6,21 @@
                 Data Diri dan Riwayat Kehamilan
             </h5>
             <div class="form-floating mt-3">
-                <input type="text" class="form-control" id="name" placeholder="Nama" required>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Nama" required>
                 <label for="name">1. Nama</label>
             </div>
             <div class="row">
                 <div class="col-sm-4">
                     <div class="form-floating mt-3">
-                        <input type="number" class="form-control" id="age" placeholder="Usia" min="1" required>
+                        <input type="number" class="form-control" name="age" id="age" placeholder="Usia" min="1"
+                            required>
                         <label for="age">2. Usia (tahun)</label>
                     </div>
                 </div>
                 <div class="col-sm-8">
                     <div class="form-floating mt-3">
-                        <input type="number" class="form-control" id="height" placeholder="Tinggi Badan" min="1"
-                            required>
+                        <input type="number" class="form-control" name="height" id="height" placeholder="Tinggi Badan"
+                            min="1" required>
                         <label for="height">3. Tinggi Badan (cm)</label>
                     </div>
                 </div>
@@ -27,28 +28,32 @@
             <div class="row">
                 <div class="col-sm-4">
                     <div class="form-floating mt-3">
-                        <input type="number" class="form-control" id="gravida" placeholder="..." min="1" required>
+                        <input type="number" class="form-control" name="gravida" id="gravida" placeholder="..." min="1"
+                            required>
                         <label for="gravida">4. Hamil ke ...</label>
                     </div>
                 </div>
                 <div class="col-sm-8">
                     <div class="form-floating mt-3">
-                        <input type="number" class="form-control" id="current_pregnancy_months" placeholder="..."
-                            min="1" required>
+                        <input type="number" class="form-control" name="current_pregnancy_months"
+                            id="current_pregnancy_months" placeholder="..." min="1" required>
                         <label for="current_pregnancy_months">5. Usia Kehamilan (bulan)</label>
                     </div>
                 </div>
             </div>
             <div class="form-floating mt-3">
-                <input type="number" class="form-control" id="marriage_year" placeholder="..." min="1" required>
+                <input type="number" class="form-control" name="marriage_year" id="marriage_year" placeholder="..."
+                    min="1" required>
                 <label for="marriage_year">6. Tahun Menikah</label>
             </div>
             <div class="form-floating mt-3">
-                <input type="number" class="form-control" id="first_pregnancy_year" placeholder="..." min="1" required>
+                <input type="number" class="form-control" name="first_pregnancy_year" id="first_pregnancy_year"
+                    placeholder="..." min="1" required>
                 <label for="first_pregnancy_year">7. Tahun Hamil Pertama</label>
             </div>
             <div class="form-floating mt-3">
-                <input type="number" class="form-control" id="last_delivery_year" placeholder="..." min="1" required>
+                <input type="number" class="form-control" name="last_delivery_year" id="last_delivery_year"
+                    placeholder="..." min="1" required>
                 <label for="last_delivery_year">8. Tahun Melahirkan Terakhir</label>
             </div>
         </div>
@@ -71,7 +76,8 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">10. Pernah operasi sesar? <span class="text-danger-emphasis"><i
+                <label class="form-label">10. Pernah operasi sesar? <span class="text-danger-emphasis"
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keadaan darurat obstetri"><i
                             class="fa-solid fa-circle-exclamation"></i></span></label>
                 <div>
                     <input type="radio" class="btn-check" name="history_csection" value="ya" id="history_csection_ya"

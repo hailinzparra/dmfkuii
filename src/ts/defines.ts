@@ -1,3 +1,5 @@
+declare const bootstrap: any
+
 interface Firebase {
     database(): {
         ref(path?: string): FirebaseDatabase

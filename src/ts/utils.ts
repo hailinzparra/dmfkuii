@@ -64,6 +64,9 @@ const dom = {
         })
         return value
     },
+    get_input_check_value(name: string) {
+        return Array.from(this.qa<'input'>(`input[name="${name}"]:checked`)).map(el => el.value)
+    },
     hide(...elements: HTMLElement[]) {
         for (const el of elements) {
             el.classList.add('visually-hidden')

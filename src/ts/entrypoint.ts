@@ -1,5 +1,7 @@
+main.init_bs_tooltip()
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        // navigator.serviceWorker.register('/service_worker.js')
+        navigator.serviceWorker.register('/service_worker.js')
     })
 }
