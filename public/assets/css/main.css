@@ -1,0 +1,8 @@
+:root {
+    --bs-body-font-family: "Geologica", sans-serif;
+}
+
+a.disabled {
+    pointer-events: none;
+    opacity: 0.65;
+}
