@@ -1,8 +1,14 @@
-<!-- <script defer src="/assets/js/kspr/home.js"></script> -->
-<insert-template-nav />
+<script defer src="/assets/js/kspr/home.js"></script>
 <div class="container">
-    hi im kspr
-    <a href="/">go to home</a>
+    <div class="card mt-3 shadow-sm">
+        <div class="card-body text-center">
+            <img src="/assets/images/kspr/logo-fkuii-pkm.png" alt="Logo FK UII dan Puskesmas Sukodono"
+                style="width: 100%; max-width: 320px;">
+            <h3 class="mt-3">Kartu Skoring Poedji Rochjati (KSPR)</h3>
+            <div class="text-primary">Diisi oleh PKK dan Petugas Kesehatan</div>
+            <hr />
+            <insert-component-kspr/form-kspr />
+        </div>
+    </div>
 </div>
-<insert-template-footer />
 <insert-template-entrypoint />
