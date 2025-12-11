@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const current_year = new Date().getFullYear()
 
     const boolean_questions_data = [
-        { id: 'preeclampsia', label: '13. Bengkak pada muka/tungkai dan tekanan darah tinggi', is_emergency: false },
-        { id: 'twins', label: '14. Hamil kembar 2 atau lebih', is_emergency: false },
-        { id: 'hydramnion', label: '15. Hamil kembar air (Hydramnion)', is_emergency: false },
-        { id: 'stillbirth', label: '16. Bayi mati dalam kandungan', is_emergency: false },
-        { id: 'breech', label: '17. Letak sungsang', is_emergency: true },
-        { id: 'transverse', label: '18. Letak lintang', is_emergency: true },
-        { id: 'bleeding', label: '19. Perdarahan dalam kehamilan ini', is_emergency: true },
-        { id: 'severe_preeclampsia', label: '20. Preeklamsia berat/kejang-kejang', is_emergency: true },
+        { id: 'preeclampsia', label: '13. Bengkak pada muka/tungkai dan tekanan darah tinggi', weight: 4, is_emergency: false },
+        { id: 'twins', label: '14. Hamil kembar 2 atau lebih', weight: 4, is_emergency: false },
+        { id: 'hydramnion', label: '15. Hamil kembar air (Hydramnion)', weight: 4, is_emergency: false },
+        { id: 'stillbirth', label: '16. Bayi mati dalam kandungan', weight: 4, is_emergency: false },
+        { id: 'breech', label: '17. Letak sungsang', weight: 8, is_emergency: true },
+        { id: 'transverse', label: '18. Letak lintang', weight: 8, is_emergency: true },
+        { id: 'bleeding', label: '19. Perdarahan dalam kehamilan ini', weight: 8, is_emergency: true },
+        { id: 'severe_preeclampsia', label: '20. Preeklamsia berat/kejang-kejang', weight: 8, is_emergency: true },
     ]
 
     const warning_icon = ' <span class="text-danger-emphasis" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keadaan darurat obstetri"><i class="fa-solid fa-circle-exclamation"></i></span>'
@@ -35,6 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     render_boolean_questions()
 
+    const input_gravida = dom.qe(form, '#gravida')! as HTMLInputElement
+    const input_last_delivery_year = dom.qe(form, '#last_delivery_year')! as HTMLInputElement
+
+    input_gravida.addEventListener('change', e => {
+        const gravida = parseInt(input_gravida.value) || 0
+        if (gravida < 2) {
+            input_last_delivery_year.disabled = true
+        }
+        else {
+            input_last_delivery_year.disabled = false
+        }
+    })
+
     form.addEventListener('submit', e => {
         e.preventDefault()
         calculate_risk_score()
@@ -57,95 +70,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // get numbs
         const age = parseInt(data.age) || 0
+        const height = parseInt(data.height) || 0
         const gravida = parseInt(data.gravida) || 0
         const current_pregnancy_months = parseInt(data.current_pregnancy_months) || 0
         const marriage_year = parseInt(data.marriage_year) || 0
         const first_pregnancy_year = parseInt(data.first_pregnancy_year) || 0
         const last_delivery_year = parseInt(data.last_delivery_year) || 0
 
-        problem_factors.push({ desc: 'Skor Awal Kehamilan Risiko Rendah', added_score: 2, is_emergency: false })
+        problem_factors.push({ desc: 'Skor awal', added_score: 2, is_emergency: false })
 
-        // // =================================================================
-        // // A. Perhitungan Usia/Jarak Kehamilan & Faktor Risiko (+SKOR 4)
-        // // =================================================================
-
-        // // Perkiraan usia ibu saat hamil pertama
-        // const ageAtFirstPregnancy = age - (currentYear - firstPregnancyYear);
-
-        // // 1. Terlalu muda (hamil pertama usia <= 16 tahun)
-        // if (ageAtFirstPregnancy <= 16) { score += 4; problem_factors.push({ description: 'Terlalu Muda Hamil Pertama (Usia ≤ 16 tahun)', addedScore: 4, isEmergency: false }); }
-
-        // // 2. Terlalu tua (hamil pertama usia >= 35 tahun)
-        // if (ageAtFirstPregnancy >= 35) { score += 4; problem_factors.push({ description: 'Terlalu Tua Hamil Pertama (Usia ≥ 35 tahun)', addedScore: 4, isEmergency: false }); }
-
-        // // 3. Terlalu lambat hamil (hamil pertama >= 4 tahun menikah)
-        // const yearsToFirstPregnancy = firstPregnancyYear - marriageYear;
-        // if (yearsToFirstPregnancy >= 4) { score += 4; problem_factors.push({ description: 'Terlalu Lama Hamil (≥ 4 tahun setelah menikah)', addedScore: 4, isEmergency: false }); }
-
-        // // Perkiraan tahun kehamilan sekarang dimulai (digunakan untuk menghitung interval)
-        // const currentPregnancyStartYear = currentYear - Math.floor((currentPregnancyMonths - 1) / 12);
-        // const interval = currentPregnancyStartYear - lastDeliveryYear;
-
-        // // 4. Terlalu cepat hamil lagi (jarak < 2 tahun)
-        // if (gravida > 1 && lastDeliveryYear > 0 && interval < 2) { score += 4; problem_factors.push({ description: 'Terlalu Cepat Hamil Lagi (Jarak < 2 tahun)', addedScore: 4, isEmergency: false }); }
-
-        // // 5. Terlalu lama hamil lagi (jarak >= 10 tahun)
-        // if (gravida > 1 && lastDeliveryYear > 0 && interval >= 10) { score += 4; problem_factors.push({ description: 'Terlalu Lama Hamil Lagi (Jarak ≥ 10 tahun)', addedScore: 4, isEmergency: false }); }
-
-        // // 6. Terlalu banyak anak (4 / lebih)
-        // if (gravida >= 5) { score += 4; problem_factors.push({ description: 'Terlalu Banyak Anak (Hamil ke-5 atau lebih)', addedScore: 4, isEmergency: false }); }
-
-        // // 7. Terlalu tua (usia >= 35 tahun) - Usia saat ini
-        // if (age >= 35) { score += 4; problem_factors.push({ description: 'Usia Ibu Saat Ini Terlalu Tua (≥ 35 tahun)', addedScore: 4, isEmergency: false }); }
-
-        // // 8. Terlalu pendek (tinggi badan <= 145 cm)
-        // if (data.height === '<=145') { score += 4; problem_factors.push({ description: 'Terlalu Pendek (Tinggi Badan ≤ 145 cm)', addedScore: 4, isEmergency: false }); }
-
-        // // 9. Pernah gagal kehamilan
-        // if (data.historyFailedPregnancy === 'ya') { score += 4; problem_factors.push({ description: 'Riwayat Gagal Kehamilan', addedScore: 4, isEmergency: false }); }
-
-        // // 10. Pernah melahirkan dengan... (+4 per opsi). DITANDAI EMERGENSI
-        // data.deliveryComplications.forEach(complication => {
-        //     score += 4;
-        //     is_emergency_detected = true; // Dianggap emergensi berdasarkan permintaan user
-        //     problem_factors.push({ description: `Riwayat Melahirkan dengan Komplikasi (Q10): ${complication}`, addedScore: 4, isEmergency: true });
-        // });
-
-        // // 11. Punya penyakit dari pertanyaan 11 (+4 per opsi)
-        // data.maternalDiseases.forEach(disease => {
-        //     score += 4;
-        //     problem_factors.push({ description: `Penyakit Ibu Hamil: ${disease}`, addedScore: 4, isEmergency: false });
-        // });
-
-        // // 12. Kehamilan lebih bulan (Asumsi > 10 bulan)
-        // if (currentPregnancyMonths > 10) { score += 4; problem_factors.push({ description: 'Kehamilan Lebih Bulan (Usia kehamilan > 10 bulan)', addedScore: 4, isEmergency: false }); }
-
-        // // Pertanyaan Ya/Tidak dengan Skor 4
-        // booleanQuestionsData.filter(q => q.weight === 4).forEach(q => {
-        //     if (data[q.id] === 'ya') {
-        //         score += q.weight;
-        //         const factor = { description: q.label.replace(/^\d+\.\s*/, ''), addedScore: q.weight, isEmergency: q.isEmergency };
-        //         problem_factors.push(factor);
-        //         if (q.isEmergency) is_emergency_detected = true;
-        //     }
-        // });
-
-        // // =================================================================
-        // // B. Perhitungan Risiko Sangat Tinggi (Semua +SKOR 8)
-        // // =================================================================
-
-        // // 13. Pernah operasi sesar (+8)
-        // if (data.historyCSection === 'ya') { score += 8; problem_factors.push({ description: 'Riwayat Operasi Sesar', addedScore: 8, isEmergency: true }); is_emergency_detected = true; }
-
-        // // Pertanyaan Ya/Tidak dengan Skor 8 (Semua ini adalah KATEGORI EMERGENSI)
-        // booleanQuestionsData.filter(q => q.weight === 8).forEach(q => {
-        //     if (data[q.id] === 'ya') {
-        //         score += q.weight;
-        //         const factor = { description: q.label.replace(/^\d+\.\s*/, ''), addedScore: q.weight, isEmergency: q.isEmergency };
-        //         problem_factors.push(factor);
-        //         if (q.isEmergency) is_emergency_detected = true;
-        //     }
-        // });
+        // Perkiraan usia ibu saat hamil pertama
+        const age_at_first_pregnancy = age - (current_year - first_pregnancy_year)
+        // 1. Terlalu muda (hamil pertama usia <= 16 tahun)
+        if (age_at_first_pregnancy <= 16) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu muda, hamil pertama usia ≤ 16 tahun', added_score: 4, is_emergency: false })
+        }
+        // 2. Terlalu tua (hamil pertama usia >= 35 tahun)
+        if (age_at_first_pregnancy >= 35) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu tua, hamil pertama usia ≥ 35 tahun', added_score: 4, is_emergency: false })
+        }
+        // 3. Terlalu lambat hamil (hamil pertama >= 4 tahun menikah)
+        const years_to_first_pregnancy = first_pregnancy_year - marriage_year
+        if (years_to_first_pregnancy >= 4) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu lambat hamil pertama (≥ 4 tahun setelah menikah)', added_score: 4, is_emergency: false })
+        }
+        // Perkiraan tahun kehamilan sekarang dimulai (digunakan untuk menghitung interval)
+        const current_pregnancy_start_year = current_year - Math.floor((current_pregnancy_months - 1) / 12)
+        const interval = current_pregnancy_start_year - last_delivery_year
+        // 4. Terlalu cepat hamil lagi (jarak < 2 tahun)
+        if (gravida > 1 && last_delivery_year > 0 && interval < 2) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu cepat hamil lagi (jarak < 2 tahun)', added_score: 4, is_emergency: false })
+        }
+        // 5. Terlalu lama hamil lagi (jarak >= 10 tahun)
+        if (gravida > 1 && last_delivery_year > 0 && interval >= 10) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu lama hamil lagi (jarak ≥ 10 tahun)', added_score: 4, is_emergency: false })
+        }
+        // 6. Terlalu banyak anak (4 / lebih)
+        if (gravida >= 5) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu banyak anak (hamil ke-5 atau lebih)', added_score: 4, is_emergency: false })
+        }
+        // 7. Terlalu tua (usia >= 35 tahun)
+        if (age >= 35) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu tua (usia ≥ 35 tahun)', added_score: 4, is_emergency: false })
+        }
+        // 8. Terlalu pendek (tinggi badan <= 145 cm)
+        if (height <= 145) {
+            score += 4
+            problem_factors.push({ desc: 'Terlalu pendek (tinggi badan ≤ 145 cm)', added_score: 4, is_emergency: false })
+        }
+        // 9. Pernah gagal kehamilan
+        if (data.history_failed_pregnancy === 'ya') {
+            score += 4
+            problem_factors.push({ desc: 'Pernah gagal kehamilan', added_score: 4, is_emergency: false })
+        }
+        // 10. Pernah melahirkan dengan... (+4 per opsi)
+        (data.delivery_complications as string[]).forEach(complication => {
+            score += 4
+            problem_factors.push({ desc: `Pernah melahirkan dengan: ${complication}`, added_score: 4, is_emergency: true })
+        })
+        // 11. Punya penyakit dari pertanyaan 11 (+4 per opsi)
+        const maternal_diseases: string[] = data.maternal_diseases || []
+        for (const disease of maternal_diseases) {
+            score += 4
+            problem_factors.push({ desc: `Penyakit ibu hamil: ${disease}`, added_score: 4, is_emergency: false })
+        }
+        // 12. Kehamilan lebih bulan (Asumsi >= 10 bulan)
+        if (current_pregnancy_months > 10) {
+            score += 4
+            problem_factors.push({ desc: 'Kehamilan lebih bulan (usia kehamilan > 10 bulan)', added_score: 4, is_emergency: false })
+        }
+        // Pertanyaan Ya/Tidak dengan Skor 4
+        boolean_questions_data.filter(q => q.weight === 4).forEach(q => {
+            if (data[q.id] === 'ya') {
+                score += q.weight
+                problem_factors.push({ desc: q.label.replace(/^\d+\.\s*/, ''), added_score: q.weight, is_emergency: q.is_emergency })
+                if (q.is_emergency) is_emergency_detected = true
+            }
+        })
+        // 13. Pernah operasi sesar (+8)
+        if (data.history_csection === 'ya') {
+            score += 8
+            problem_factors.push({ desc: 'Pernah operasi sesar', added_score: 8, is_emergency: true })
+            is_emergency_detected = true
+        }
+        // Pertanyaan Ya/Tidak dengan Skor 8 (Semua ini adalah KATEGORI EMERGENSI)
+        boolean_questions_data.filter(q => q.weight === 8).forEach(q => {
+            if (data[q.id] === 'ya') {
+                score += q.weight
+                problem_factors.push({ desc: q.label.replace(/^\d+\.\s*/, ''), added_score: q.weight, is_emergency: q.is_emergency })
+                if (q.is_emergency) is_emergency_detected = true
+            }
+        })
 
         let category = 'Kehamilan Risiko Rendah (KRR)'
         let recommendation = 'Risiko kehamilan pasien rendah. Tidak perlu rujuk. Persalinan bisa di rumah/polindes dengan penolong bidan.'
@@ -159,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (score >= 6) {
             category = 'Kehamilan Risiko Tinggi (KRT)'
             recommendation = 'Risiko kehamilan pasien tinggi. Pasien dapat dirujuk ke bidan atau puskesmas. Persalinan bisa di polindes/puskesmas/RS dengan penolong bidan/dokter.'
-            color_class = 'danger'
+            color_class = 'warning'
         }
 
         display_result(
@@ -226,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="ms-2 me-auto">
                         Total Skor
                     </div>
-                    <span class="badge text-bg-success rounded-pill">${score}</span>
+                    <span class="badge text-bg-${color_class} rounded-pill">${score}</span>
                 </li>
             </ul>
         </div>
@@ -235,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h5><i class="fa-solid fa-notes-medical"></i> Rekomendasi Tindak Lanjut</h5>
                 <div class="mb-2">${recommendation}</div>
                 <div class="text-muted small fst-italic">Disclaimer: Alat ini adalah alat bantu skrining. Konsultasikan hasil dan kondisi selalu dengan dokter spesialis kandungan atau bidan.</div>
+                <div class="text-muted small fst-italic">Kategori: <span class="text-success-emphasis">KRR (Skor 2—5)</span>, <span class="text-warning-emphasis">KRT (Skor 6—11)</span>, <span class="text-danger-emphasis">KRST (Skor ≥12)</span></div>
             </div>
         </div>
     </div>
