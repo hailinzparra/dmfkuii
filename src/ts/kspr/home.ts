@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const color = f.added_score >= 8 ? 'danger' : f.added_score >= 4 ? 'warning' : 'success'
             return `<li class="list-group-item list-group-item-${color} d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">${f.desc}</div>
-                    <span class="badge text-bg-${color} rounded-pill">+2</span>
+                    <span class="badge text-bg-${color} rounded-pill">+${f.added_score}</span>
                 </li>`
         }).join('')
 
