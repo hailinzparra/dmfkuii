@@ -4,23 +4,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const current_year = new Date().getFullYear()
 
     const boolean_questions_data = [
-        { id: 'preeclampsia', label: '13. Bengkak pada muka/tungkai dan tekanan darah tinggi', weight: 4, is_emergency: false },
-        { id: 'twins', label: '14. Hamil kembar 2 atau lebih', weight: 4, is_emergency: false },
-        { id: 'hydramnion', label: '15. Hamil kembar air (Hydramnion)', weight: 4, is_emergency: false },
-        { id: 'stillbirth', label: '16. Bayi mati dalam kandungan', weight: 4, is_emergency: false },
-        { id: 'breech', label: '17. Letak sungsang', weight: 8, is_emergency: true },
-        { id: 'transverse', label: '18. Letak lintang', weight: 8, is_emergency: true },
-        { id: 'bleeding', label: '19. Perdarahan dalam kehamilan ini', weight: 8, is_emergency: true },
-        { id: 'severe_preeclampsia', label: '20. Preeklamsia berat/kejang-kejang', weight: 8, is_emergency: true },
+        { id: 'stillbirth', label: '13. Saat ini bayi mati dalam kandungan', desc: '', weight: 4, is_emergency: false },
+        { id: 'preeclampsia', label: '14. Preeklamsia dalam kehamilan ini', desc: 'Hipertensi + salah satu dari tanda-tanda berikut: proteinuria, bengkak pada muka/tungkai, nyeri kepala hebat, pandangan kabur.', weight: 4, is_emergency: false },
+        { id: 'twins', label: '15. Saat ini hamil kembar 2 atau lebih', desc: '', weight: 4, is_emergency: false },
+        { id: 'hydramnion', label: '16. Saat ini hamil kembar air (polihidramnion)', desc: '', weight: 4, is_emergency: false },
+        { id: 'breech', label: '17. Saat ini letak sungsang', desc: '', weight: 8, is_emergency: true },
+        { id: 'transverse', label: '18. Saat ini letak lintang', desc: '', weight: 8, is_emergency: true },
+        { id: 'bleeding', label: '19. Perdarahan dalam kehamilan ini', desc: '', weight: 8, is_emergency: true },
+        { id: 'severe_preeclampsia', label: '20. Preeklamsia berat/kejang-kejang dalam kehamilan ini', desc: '', weight: 8, is_emergency: true },
     ]
 
     const warning_icon = ' <span class="text-danger-emphasis" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Keadaan darurat obstetri"><i class="fa-solid fa-circle-exclamation"></i></span>'
 
     const render_boolean_questions = () => {
         const container = dom.q('#boolean_questions')! as HTMLDivElement
-        container.innerHTML = boolean_questions_data.map((q, i) => `
-<div class="${i > 0 ? 'mt-3' : ''}">
+        container.innerHTML = boolean_questions_data.map((q, i) => {
+            const desc = `<div class="text-muted small mb-2">${q.desc}</div>`
+            return `<div class="${i > 0 ? 'mt-3' : ''}">
     <label class="form-label">${q.label}${q.is_emergency ? warning_icon : ''}</label>
+    ${q.desc !== '' ? desc : ''}
     <div>
         <input type="radio" class="btn-check" name="${q.id}" value="ya"
             id="${q.id}_ya" autocomplete="off">
@@ -29,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
             id="${q.id}_tidak" autocomplete="off" checked>
         <label class="btn btn-outline-success" for="${q.id}_tidak">Tidak</label>
     </div>
-</div>`).join('')
+</div>`
+        }).join('')
         main.init_bs_tooltip()
     }
 
@@ -261,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="card-body">
                 <h5><i class="fa-solid fa-notes-medical"></i> Rekomendasi Tindak Lanjut</h5>
                 <div class="mb-2">${recommendation}</div>
-                <div class="text-muted small fst-italic">Disclaimer: Alat ini adalah alat bantu skrining. Konsultasikan hasil dan kondisi selalu dengan dokter spesialis kandungan atau bidan.</div>
+                <div class="text-muted small fst-italic">Disclaimer: Alat ini adalah alat bantu skrining modifikasi KSPR. Konsultasikan hasil dan kondisi selalu dengan dokter spesialis kandungan atau bidan.</div>
                 <div class="text-muted small fst-italic">Kategori: <span class="text-success-emphasis">KRR (Skor 2—5)</span>, <span class="text-warning-emphasis">KRT (Skor 6—11)</span>, <span class="text-danger-emphasis">KRST (Skor ≥12)</span></div>
             </div>
         </div>
