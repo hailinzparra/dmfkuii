@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const age = parseInt(data.age) || 0
         const height = parseInt(data.height) || 0
         const gravida = parseInt(data.gravida) || 0
-        const current_pregnancy_months = parseInt(data.current_pregnancy_months) || 0
+        const current_pregnancy_weeks = parseInt(data.current_pregnancy_weeks) || 0
         const marriage_year = parseInt(data.marriage_year) || 0
         const first_pregnancy_year = parseInt(data.first_pregnancy_year) || 0
         const last_delivery_year = parseInt(data.last_delivery_year) || 0
@@ -98,7 +98,12 @@ document.addEventListener('DOMContentLoaded', () => {
             problem_factors.push({ desc: 'Terlalu lambat hamil pertama (≥ 4 tahun setelah menikah)', added_score: 4, is_emergency: false })
         }
         // Perkiraan tahun kehamilan sekarang dimulai (digunakan untuk menghitung interval)
-        const current_pregnancy_start_year = current_year - Math.floor((current_pregnancy_months - 1) / 12)
+        const current_date = new Date()
+        const days_in_a_week = 7
+        const days_to_subtract = current_pregnancy_weeks * days_in_a_week
+        const current_pregnancy_start_date = new Date(current_date)
+        current_pregnancy_start_date.setDate(current_date.getDate() - days_to_subtract)
+        const current_pregnancy_start_year = current_pregnancy_start_date.getFullYear()
         const interval = current_pregnancy_start_year - last_delivery_year
         // 4. Terlalu cepat hamil lagi (jarak < 2 tahun)
         if (gravida > 1 && last_delivery_year > 0 && interval < 2) {
@@ -141,10 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
             score += 4
             problem_factors.push({ desc: `Penyakit ibu hamil: ${disease}`, added_score: 4, is_emergency: false })
         }
-        // 12. Kehamilan lebih bulan (Asumsi >= 10 bulan)
-        if (current_pregnancy_months > 10) {
+        // 12. Kehamilan lebih bulan (>= 42 minggu)
+        if (current_pregnancy_weeks >= 42) {
             score += 4
-            problem_factors.push({ desc: 'Kehamilan lebih bulan (usia kehamilan > 10 bulan)', added_score: 4, is_emergency: false })
+            problem_factors.push({ desc: 'Kehamilan lebih minggu (usia kehamilan ≥ 42 bulan)', added_score: 4, is_emergency: false })
         }
         // Pertanyaan Ya/Tidak dengan Skor 4
         boolean_questions_data.filter(q => q.weight === 4).forEach(q => {

@@ -35,9 +35,9 @@
                 </div>
                 <div class="col-sm-8">
                     <div class="form-floating mt-3">
-                        <input type="number" class="form-control" name="current_pregnancy_months"
-                            id="current_pregnancy_months" placeholder="..." min="1" required>
-                        <label for="current_pregnancy_months">5. Usia Kehamilan (bulan)</label>
+                        <input type="number" class="form-control" name="current_pregnancy_weeks"
+                            id="current_pregnancy_weeks" placeholder="..." min="1" required>
+                        <label for="current_pregnancy_weeks">5. Usia Kehamilan (minggu)</label>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                 Riwayat Komplikasi & Penyakit
             </h5>
             <div class="mb-3">
-                <label class="form-label">9. Pernah gagal kehamilan?</label>
+                <label class="form-label">9. Pernah gagal kehamilan? (BO/abortus)</label>
                 <div>
                     <input type="radio" class="btn-check" name="history_failed_pregnancy" value="ya"
                         id="history_failed_pregnancy_ya" autocomplete="off">
@@ -120,42 +120,63 @@
                     <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
                         name="maternal_diseases" value="kurang darah" id="maternal_diseases1">
                     <label class="form-check-label" for="maternal_diseases1">
-                        Kurang darah
+                        Anemia (kurang darah)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                        name="maternal_diseases" value="malaria" id="maternal_diseases2">
+                        name="maternal_diseases" value="autoimun" id="maternal_diseases2">
                     <label class="form-check-label" for="maternal_diseases2">
+                        Autoimun
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="diabetes" id="maternal_diseases3">
+                    <label class="form-check-label" for="maternal_diseases3">
+                        Diabetes
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="hepatitis B" id="maternal_diseases4">
+                    <label class="form-check-label" for="maternal_diseases4">
+                        Hepatitis B
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="hipertensi" id="maternal_diseases5">
+                    <label class="form-check-label" for="maternal_diseases5">
+                        Hipertensi
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="jantung" id="maternal_diseases6">
+                    <label class="form-check-label" for="maternal_diseases6">
+                        Jantung
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="TBC paru" id="maternal_diseases7">
+                    <label class="form-check-label" for="maternal_diseases7">
+                        TB Paru
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
+                        name="maternal_diseases" value="malaria" id="maternal_diseases8">
+                    <label class="form-check-label" for="maternal_diseases8">
                         Malaria
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                        name="maternal_diseases" value="TBC paru" id="maternal_diseases3">
-                    <label class="form-check-label" for="maternal_diseases3">
-                        TBC paru
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                        name="maternal_diseases" value="payah jantung" id="maternal_diseases4">
-                    <label class="form-check-label" for="maternal_diseases4">
-                        Payah jantung
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                        name="maternal_diseases" value="kencing manis (diabetes)" id="maternal_diseases5">
-                    <label class="form-check-label" for="maternal_diseases5">
-                        Kencing manis (diabetes)
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input form-check-input-warning-emphasis" type="checkbox"
-                        name="maternal_diseases" value="Penyakit Menular Seksual" id="maternal_diseases6">
-                    <label class="form-check-label" for="maternal_diseases6">
-                        Penyakit Menular Seksual
+                        name="maternal_diseases" value="Penyakit Menular Seksual" id="maternal_diseases9">
+                    <label class="form-check-label" for="maternal_diseases9">
+                        Penyakit Menular Seksual (contoh: sifilis, HIV, klamidia, gonore)
                     </label>
                 </div>
             </div>
