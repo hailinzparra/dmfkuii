@@ -1,0 +1,44 @@
+{
+    "name": "LOKIN - Puskesmas Sukodono",
+    "short_name": "LOKIN",
+    "lang": "id-ID",
+    "description": "Logbook Indikator Puskesmas Sukodono",
+    "categories": [
+        "productivity"
+    ],
+    "id": "/",
+    "scope": "/",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "natural",
+    "theme_color": "#f8fafc",
+    "background_color": "#f8fafc",
+    "icons": [
+        {
+            "src": "/assets/images/favicon.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "/assets/images/favicon.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/assets/images/ss-narrow-1.png",
+            "type": "image/png",
+            "sizes": "540x720",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/assets/images/ss-wide-1.png",
+            "type": "image/png",
+            "sizes": "720x420",
+            "form_factor": "wide"
+        }
+    ]
+}

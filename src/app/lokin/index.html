@@ -2,9 +2,20 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOKIN - Puskesmas Sukodono (Database Integration)</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Logbook Indikator Puskesmas Sukodono" />
+    <meta name="static-version" content="v0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="LOKIN - Puskesmas Sukodono" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#f8fafc" />
+    <link rel="manifest" href="/lokin/manifest.json" />
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+    <title>LOKIN - Puskesmas Sukodono</title>
     <script defer src="/__/firebase/12.5.0/firebase-app-compat.js"></script>
     <script defer src="/__/firebase/12.5.0/firebase-database-compat.js"></script>
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
@@ -70,7 +81,7 @@
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tight text-slate-800">LOKIN</h1>
                         <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest hidden md:block">
-                            Puskesmas Sukodono</p>
+                            Logbook Indikator Puskesmas Sukodono</p>
                     </div>
                 </div>
 
@@ -123,8 +134,8 @@
         <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-6 mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-2">
                 <div>
-                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide text-blue-600">Tren Performa
-                        Global</h3>
+                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide text-blue-600">Tren Capaian
+                    </h3>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Akumulasi Capaian Filter
                         Tahun Terpilih</p>
                 </div>
@@ -217,7 +228,7 @@
             { id: 3, name: "Dewasa dan Lansia", color: "emerald", icon: "3" },
             { id: 4, name: "Penyakit Menular", color: "amber", icon: "4" },
             { id: 5, name: "Lintas Klaster", color: "purple", icon: "5" },
-            { id: 6, name: "Gabungan", color: "slate", icon: "6" }
+            // { id: 6, name: "Gabungan", color: "slate", icon: "6" }
         ];
 
         // Definisi 56 Indikator
@@ -273,11 +284,11 @@
             { id: "m_pem_8", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pendataan", target: "100%", type: "percent", unit: "%" },
             { id: "m_pem_9", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pembinaan", target: "100%", type: "percent", unit: "%" },
             { id: "m_pem_10", cluster: 1, sub: "Pemberdayaan", name: "Kepesertaan JKN Aktif", target: ">90%", type: "percent", unit: "%" },
-            { id: "k2_placeholder", cluster: 2, sub: "KIA", name: "Capaian Ibu Hamil K4", target: "100%", type: "percent", unit: "%" },
-            { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
-            { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
-            { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
-            { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
+            { id: "k2_placeholder", cluster: 2, sub: "KIA", name: "Contoh: Capaian Ibu Hamil K4", target: "100%", type: "percent", unit: "%" },
+            { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Contoh: Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
+            { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Contoh: Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
+            { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Contoh: Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
+            // { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
         ];
 
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
