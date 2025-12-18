@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Indikator Pelayanan Puskesmas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-7xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900 mb-2">
+                Sistem Informasi Kinerja Puskesmas
+            </h1>
+            <p class="text-lg text-gray-600">
+                Visualisasi Capaian Indikator 6 Klaster Berbasis Bulanan
+            </p>
+        </header>
+
+        <!-- Ringkasan Global -->
+        <div id="summary-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"></div>
+
+        <!-- Filter Kontrol -->
+        <div class="mb-8 p-4 bg-white shadow-md rounded-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Bulan</label>
+                <select id="month-filter" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="0">Januari</option>
+                    <option value="1">Februari</option>
+                    <option value="2">Maret</option>
+                    <option value="3">April</option>
+                    <option value="4">Mei</option>
+                    <option value="5">Juni</option>
+                    <option value="6">Juli</option>
+                    <option value="7">Agustus</option>
+                    <option value="8" selected>September</option>
+                    <option value="9">Oktober</option>
+                    <option value="10">November</option>
+                    <option value="11">Desember</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Cari Nama</label>
+                <input type="text" id="search-input" placeholder="Cari indikator..."
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Klaster</label>
+                <select id="cluster-filter" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="all">Semua Klaster</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Status</label>
+                <select id="status-filter" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="all">Semua Status</option>
+                    <option value="Tercapai">Tercapai</option>
+                    <option value="Belum Tercapai">Belum Tercapai</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dashboard Konten -->
+        <div id="dashboard-content" class="space-y-10"></div>
+
+        <footer class="mt-12 text-center text-sm text-gray-400 p-4 border-t">
+            <p>&copy; 2025 Puskesmas Digital Hub. Data dihitung berdasarkan entri bulanan.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Struktur data baru: achievementHistory menyimpan array [Jan, Feb, Mar, ..., Des]
+        const indicators = [
+            { 
+                cluster: "1. Klaster 1: Manajemen", 
+                subCategory: "A. Manajemen Inti", 
+                name: "Punya Rencana Lima Tahunan", 
+                target: "Punya", 
+                unit: "", 
+                achievementHistory: Array(12).fill("Punya") 
+            },
+            { 
+                cluster: "1. Klaster 1: Manajemen", 
+                subCategory: "A. Manajemen Inti", 
+                name: "Menyusun RUK", 
+                target: ">75%", 
+                unit: "", 
+                achievementHistory: [70, 75, 80, 85, 90, 95, 100, 100, 100, 100, 100, 100].map(v => v + "%")
+            },
+            { 
+                cluster: "1. Klaster 1: Manajemen", 
+                subCategory: "A. Manajemen Inti", 
+                name: "Menyusun RPK", 
+                target: "Ya", 
+                unit: "", 
+                achievementHistory: Array(12).fill("Ya") 
+            },
+            { 
+                cluster: "1. Klaster 1: Manajemen", 
+                subCategory: "A. Manajemen Inti", 
+                name: "Melaksanakan mini lokakarya bulanan", 
+                target: "1", 
+                unit: "kali/bulan", 
+                achievementHistory: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] 
+            },
+            { 
+                cluster: "1. Klaster 1: Manajemen", 
+                subCategory: "B. Manajemen Mutu", 
+                name: "Kepatuhan Petugas terhadap SOP", 
+                target: ">= 90%", 
+                unit: "", 
+                achievementHistory: [85, 88, 90, 90, 92, 90, 91, 90, 90, 93, 94, 95].map(v => v + "%")
+            },
+            { 
+                cluster: "2. Klaster 2: Ibu dan Anak", 
+                subCategory: "", 
+                name: "Ibu Hamil ANC 6", 
+                target: "100%", 
+                unit: "", 
+                achievementHistory: [80, 85, 90, 95, 100, 100, 100, 100, 100, 100, 100, 100].map(v => v + "%")
+            },
+            { 
+                cluster: "3. Klaster 3: Usia Dewasa dan Lansia", 
+                name: "Skrining Hipertensi", 
+                target: "100%", 
+                unit: "%", 
+                achievementHistory: [70, 75, 80, 85, 90, 95, 100, 100, 100, 100, 100, 100]
+            },
+            { 
+                cluster: "3. Klaster 3: Usia Dewasa dan Lansia", 
+                name: "Skrining DM", 
+                target: "100%", 
+                unit: "%", 
+                achievementHistory: [60, 65, 70, 80, 90, 100, 100, 100, 100, 100, 100, 100]
+            },
+            { 
+                cluster: "5. Gabungan", 
+                name: "Cakupan pelayanan kasus ODGJ", 
+                target: "100%", 
+                unit: "", 
+                achievementHistory: [50, 60, 70, 80, 85, 90, 90, 90, 90, 90, 90, 90].map(v => v + "%"),
+                details: [ { label: "Total Kasus", value: "24 Kasus" } ]
+            }
+        ];
+
+        // Helper untuk mendapatkan data bulan terpilih
+        function getAchievementByMonth(indicator, monthIndex) {
+            return indicator.achievementHistory[monthIndex];
+        }
+
+        function determineStatus(targetStr, achievement) {
+            if (!achievement) return 'Belum Ada Data';
+            const t = targetStr.toString().toLowerCase();
+            const a = achievement.toString().toLowerCase();
+            
+            if (t.includes("punya") || t.includes("ya")) {
+                return a === t ? 'Tercapai' : 'Belum Tercapai';
+            }
+
+            const tVal = parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+            const aVal = parseFloat(a.replace(/[^0-9.]/g, '')) || 0;
+
+            if (t.includes('>=')) return aVal >= tVal ? 'Tercapai' : 'Belum Tercapai';
+            if (t.includes('>')) return aVal > tVal ? 'Tercapai' : 'Belum Tercapai';
+            
+            return aVal >= tVal ? 'Tercapai' : 'Belum Tercapai';
+        }
+
+        function renderDashboard(data, monthIndex) {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = '';
+            
+            if (data.length === 0) {
+                content.innerHTML = '<div class="text-center py-20 text-gray-400">Tidak ada indikator yang sesuai dengan filter.</div>';
+                return;
+            }
+
+            const clustered = data.reduce((acc, item) => {
+                if (!acc[item.cluster]) acc[item.cluster] = [];
+                acc[item.cluster].push(item);
+                return acc;
+            }, {});
+
+            Object.keys(clustered).sort().forEach(clusterName => {
+                const section = document.createElement('section');
+                section.className = 'mb-12';
+                
+                section.innerHTML = `
+                    <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                        <span class="w-2 h-8 bg-blue-600 rounded mr-3"></span>
+                        ${clusterName}
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${clustered[clusterName].map(item => {
+                            const achievement = getAchievementByMonth(item, monthIndex);
+                            const status = determineStatus(item.target, achievement);
+                            const isTercapai = status === 'Tercapai';
+                            
+                            return `
+                                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition">
+                                    <div>
+                                        ${item.subCategory ? `<span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">${item.subCategory}</span>` : ''}
+                                        <h3 class="text-gray-800 font-bold text-lg mb-4 leading-tight">${item.name}</h3>
+                                        
+                                        <div class="space-y-2 mb-4">
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-500">Target</span>
+                                                <span class="font-semibold text-gray-700">${item.target} ${item.unit}</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-500">Capaian</span>
+                                                <span class="font-extrabold text-blue-600">${achievement} ${item.unit}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-2 py-2 rounded-lg text-center font-bold text-sm ${isTercapai ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                        ${status}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                content.appendChild(section);
+            });
+        }
+
+        function renderSummary(monthIndex) {
+            const summary = document.getElementById('summary-cards');
+            const total = indicators.length;
+            const achieved = indicators.filter(i => {
+                const acc = getAchievementByMonth(i, monthIndex);
+                return determineStatus(i.target, acc) === 'Tercapai';
+            }).length;
+            const rate = ((achieved / total) * 100).toFixed(1);
+
+            summary.innerHTML = `
+                <div class="bg-blue-600 p-6 rounded-2xl text-white shadow-lg">
+                    <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">Total Indikator</p>
+                    <p class="text-4xl font-black mt-1">${total}</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">Tercapai</p>
+                    <p class="text-4xl font-black text-green-600 mt-1">${achieved}</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">Belum Tercapai</p>
+                    <p class="text-4xl font-black text-red-500 mt-1">${total - achieved}</p>
+                </div>
+                <div class="bg-indigo-700 p-6 rounded-2xl text-white shadow-lg">
+                    <p class="text-indigo-100 text-sm font-medium uppercase tracking-wider">Kinerja Bulan Ini</p>
+                    <p class="text-4xl font-black mt-1">${rate}%</p>
+                </div>
+            `;
+        }
+
+        function init() {
+            const monthFilter = document.getElementById('month-filter');
+            const clusterFilter = document.getElementById('cluster-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const searchInput = document.getElementById('search-input');
+            
+            const clusters = [...new Set(indicators.map(i => i.cluster))].sort();
+            clusters.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                clusterFilter.appendChild(opt);
+            });
+
+            const filterHandler = () => {
+                const monthIdx = parseInt(monthFilter.value);
+                const search = searchInput.value.toLowerCase();
+                const cluster = clusterFilter.value;
+                const status = statusFilter.value;
+                
+                const filtered = indicators.filter(i => {
+                    const currentAcc = getAchievementByMonth(i, monthIdx);
+                    const currentStatus = determineStatus(i.target, currentAcc);
+                    const matchesSearch = i.name.toLowerCase().includes(search);
+                    const matchesCluster = cluster === 'all' || i.cluster === cluster;
+                    const matchesStatus = status === 'all' || currentStatus === status;
+                    return matchesSearch && matchesCluster && matchesStatus;
+                });
+
+                renderDashboard(filtered, monthIdx);
+                renderSummary(monthIdx);
+            };
+
+            [monthFilter, clusterFilter, statusFilter, searchInput].forEach(el => {
+                el.addEventListener('change', filterHandler);
+                if(el.id === 'search-input') el.addEventListener('input', filterHandler);
+            });
+
+            filterHandler(); // Initial load
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

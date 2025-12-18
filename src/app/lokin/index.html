@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOKIN - Puskesmas Sukodono (Database Integration)</title>
+    <script defer src="/__/firebase/12.5.0/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/12.5.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            transition: all 0.4s;
+            background: #f8fafc;
+        }
+
+        .nav-scrolled {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .cluster-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cluster-active .cluster-content {
+            max-height: 5000px;
+        }
+
+        .cluster-active .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-[#f8fafc] text-slate-900">
+
+    <header id="main-header" class="sticky-nav">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 py-4">
+            <nav class="flex flex-row justify-between items-center gap-4">
+                <div class="brand-container flex items-center gap-3">
+                    <div class="bg-blue-600 p-2 rounded-xl shadow-md">
+                        <i class="fas fa-hospital-user text-white text-base"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tight text-slate-800">LOKIN</h1>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest hidden md:block">
+                            Puskesmas Sukodono</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-sm">
+                    <button id="btn-view"
+                        class="px-4 md:px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm transition-all flex items-center gap-2">
+                        <i class="fas fa-eye"></i><span class="hidden sm:inline">Monitoring</span>
+                    </button>
+                    <button id="btn-edit"
+                        class="px-4 md:px-6 py-2 rounded-xl text-xs font-black text-slate-500 hover:text-blue-600 transition-all flex items-center gap-2">
+                        <i class="fas fa-pen-to-square"></i><span class="hidden sm:inline">Update Data</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 pb-12 md:px-8">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-lg relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-blue-100 text-[10px] font-black uppercase tracking-widest mb-1">Rata-rata Capaian
+                        (Sesuai Filter)</p>
+                    <h2 id="stat-avg" class="text-4xl font-black tabular-nums">0%</h2>
+                </div>
+                <i class="fas fa-chart-line absolute -right-4 -bottom-4 text-white opacity-10 text-8xl"></i>
+            </div>
+
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Indikator Tercapai</p>
+                <div class="flex items-baseline gap-2">
+                    <span id="stat-achieved" class="text-4xl font-black text-emerald-500 tabular-nums">0</span>
+                    <span id="stat-total" class="text-xl font-bold text-slate-300">/ 56</span>
+                </div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                    <div id="stat-progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-1000"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex gap-3 items-center">
+                <select id="select-month"
+                    class="flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 font-bold text-xs text-slate-700 outline-none"></select>
+                <select id="select-year"
+                    class="flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 font-bold text-xs text-slate-700 outline-none"></select>
+            </div>
+        </div>
+
+        <!-- Performa Chart Section -->
+        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-2">
+                <div>
+                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide text-blue-600">Tren Performa
+                        Global</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Akumulasi Capaian Filter
+                        Tahun Terpilih</p>
+                </div>
+                <div class="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+                    <button onclick="changeChartRange('12')" id="range-12"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm transition-all uppercase tracking-widest">Tahunan</button>
+                    <button onclick="changeChartRange('60')" id="range-60"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest">5
+                        Tahun</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Klaster List -->
+        <div id="klaster-container" class="space-y-4"></div>
+    </div>
+
+    <!-- Modal Update -->
+    <div id="edit-modal"
+        class="fixed inset-0 z-[60] hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden transform translate-y-full transition-transform duration-300"
+            id="modal-container">
+            <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                <span class="text-xs font-black text-blue-500 uppercase tracking-widest">Update Capaian</span>
+                <button onclick="closeModal()"
+                    class="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="p-8 text-center">
+                <h5 id="modal-name" class="text-xl font-black text-slate-800 mb-2"></h5>
+                <p id="modal-sub" class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-8"></p>
+                <div id="modal-input-area" class="mb-10"></div>
+                <div class="flex gap-3">
+                    <button onclick="closeModal()"
+                        class="flex-1 py-4 font-black text-slate-400 text-xs uppercase tracking-widest">Batal</button>
+                    <button onclick="saveData()"
+                        class="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl shadow-lg text-xs uppercase tracking-widest">Simpan
+                        Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ==========================================
+         * INTERFACE DATABASE (REVISED LOGIC)
+         * ==========================================
+         */
+        const DatabaseService = {
+            db: null,
+            init: function () {
+                // firebase.initializeApp(firebaseConfig);
+                this.db = firebase.database();
+                this.loadAllData();
+            },
+            loadAllData: function () {
+                this.db.ref('indicators_data').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        indicatorsData = data;
+                        updateAll();
+                    }
+                });
+            },
+            updateIndicator: function (indicatorId, year, month, value) {
+                const timestamp = new Date().toLocaleString('id-ID', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                });
+                const payload = {
+                    value: value,
+                    lastUpdated: timestamp
+                };
+                console.log(`Menyimpan ke indicators_data/${indicatorId}/${year}/${month}:`, payload);
+                this.db.ref(`indicators_data/${indicatorId}/${year}/${month}`).set(payload)
+            }
+        };
+
+        // ==========================================
+        // DATA & FRONT END LOGIC
+        // ==========================================
+
+        const KLASTER_CONFIG = [
+            { id: 1, name: "Manajemen", color: "blue", icon: "1" },
+            { id: 2, name: "Ibu dan Anak", color: "rose", icon: "2" },
+            { id: 3, name: "Dewasa dan Lansia", color: "emerald", icon: "3" },
+            { id: 4, name: "Penyakit Menular", color: "amber", icon: "4" },
+            { id: 5, name: "Lintas Klaster", color: "purple", icon: "5" },
+            { id: 6, name: "Gabungan", color: "slate", icon: "6" }
+        ];
+
+        // Definisi 56 Indikator
+        const RAW_INDICATORS = [
+            { id: "m_inti_1", cluster: 1, sub: "Inti", name: "Rencana Lima Tahunan", target: "Punya", type: "boolean", options: ["Punya", "Tidak Punya"] },
+            { id: "m_inti_2", cluster: 1, sub: "Inti", name: "Menyusun RUK", target: ">=75%", type: "percent", unit: "%" },
+            { id: "m_inti_3", cluster: 1, sub: "Inti", name: "Menyusun RPK", target: "Terinci semua", type: "select", options: ["Tidak", "Terinci kecil", "Terinci besar", "Terinci semua"] },
+            { id: "m_inti_4", cluster: 1, sub: "Inti", name: "Lokmin Bulanan", target: ">=9", type: "number", unit: " kali/tahun" },
+            { id: "m_inti_5", cluster: 1, sub: "Inti", name: "Lokmin Tribulan", target: "4", type: "number", unit: " kali/tahun" },
+            { id: "m_inti_6", cluster: 1, sub: "Inti", name: "Membuat Penilaian Kinerja", target: "Sudah difeedback", type: "select", options: ["Tidak buat", "Tidak mengirim", "Tidak difeedback", "Sudah difeedback"] },
+            { id: "m_tu_1", cluster: 1, sub: "TU", name: "SOTK", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_tu_2", cluster: 1, sub: "TU", name: "Pembagian Tugas/PJ", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_tu_3", cluster: 1, sub: "TU", name: "Evaluasi Kinerja", target: "Dilaksanakan", type: "boolean", options: ["Dilaksanakan", "Tidak dilaksanakan"] },
+            { id: "m_tu_4", cluster: 1, sub: "TU", name: "SOP Arsip", target: "100%", type: "percent", unit: "%" },
+            { id: "m_tu_5", cluster: 1, sub: "TU", name: "Tepat Menyusun SKP TW", target: "Dilaksanakan", type: "boolean", options: ["Dilaksanakan", "Tidak dilaksanakan"] },
+            { id: "m_sdm_1", cluster: 1, sub: "SDM", name: "Analisa Jabatan/Beban Kerja", target: "Dilaksanakan", type: "boolean", options: ["Dilaksanakan", "Tidak dilaksanakan"] },
+            { id: "m_sdm_2", cluster: 1, sub: "SDM", name: "Rencana Pengembangan SDM", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_sdm_3", cluster: 1, sub: "SDM", name: "Pembagian Tugas/PJ", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_sar_1", cluster: 1, sub: "Sarpras", name: "Inventarisasi Peralatan", target: "Dilakukan", type: "boolean", options: ["Dilakukan", "Tidak dilakukan"] },
+            { id: "m_sar_2", cluster: 1, sub: "Sarpras", name: "Daftar Inventaris Sarana", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_sar_3", cluster: 1, sub: "Sarpras", name: "Pemeliharaan Alkes", target: ">60%", type: "percent", unit: "%" },
+            { id: "m_sar_4", cluster: 1, sub: "Sarpras", name: "Mengisi ASPAK", target: ">60%", type: "percent", unit: "%" },
+            { id: "m_sar_5", cluster: 1, sub: "Sarpras", name: "Mencatat Keluar Masuk Obat", target: "Semua unit", type: "select", options: ["Tidak dilakukan", "1-2 unit", "3-4 unit", "Semua unit"] },
+            { id: "m_mutu_1", cluster: 1, sub: "Mutu", name: "Audit Internal", target: ">=2", type: "number", unit: " kali/tahun" },
+            { id: "m_mutu_2", cluster: 1, sub: "Mutu", name: "Rapat Tinjauan Mutu", target: ">=2", type: "number", unit: " kali/tahun" },
+            { id: "m_mutu_3", cluster: 1, sub: "Mutu", name: "Manajemen Risiko", target: "100%", type: "percent", unit: "%" },
+            { id: "m_mutu_4", cluster: 1, sub: "Mutu", name: "PPI", target: "100%", type: "percent", unit: "%" },
+            { id: "m_mutu_5", cluster: 1, sub: "Mutu", name: "Kepatuhan SOP", target: ">=90%", type: "percent", unit: "%" },
+            { id: "m_mutu_6", cluster: 1, sub: "Mutu", name: "Indeks Kepuasan Masyarakat", target: ">80%", type: "percent", unit: "%" },
+            { id: "m_mutu_7", cluster: 1, sub: "Mutu", name: "Indeks Keselamatan Pasien", target: "Tindak lanjut", type: "select", options: ["Tidak ada", "Pelaporan", "Analisis", "Tindak lanjut"] },
+            { id: "m_mutu_8", cluster: 1, sub: "Mutu", name: "K3", target: "100%", type: "percent", unit: "%" },
+            { id: "m_keu_1", cluster: 1, sub: "Keu & Aset", name: "Laporan Keuangan Perbulan", target: "Tepat waktu", type: "boolean", options: ["Tepat waktu", "Tidak tepat waktu"] },
+            { id: "m_keu_2", cluster: 1, sub: "Keu & Aset", name: "Penyerapan Anggaran", target: ">85%", type: "percent", unit: "%" },
+            { id: "m_keu_3", cluster: 1, sub: "Keu & Aset", name: "Mencatat BLUD", target: "Tiap bulan", type: "select", options: [">= 6 bulan", "4-5 bulan", "2-3 bulan", "Tiap bulan"] },
+            { id: "m_keu_4", cluster: 1, sub: "Keu & Aset", name: "Audit Eksternal (KAP)", target: "Dilakukan", type: "boolean", options: ["Dilakukan", "Tidak dilakukan"] },
+            { id: "m_keu_5", cluster: 1, sub: "Keu & Aset", name: "SP3B", target: "Tiap bulan", type: "select", options: [">= 6 bulan", "4-5 bulan", "2-3 bulan", "Tiap bulan"] },
+            { id: "m_keu_6", cluster: 1, sub: "Keu & Aset", name: "RBA BLUD", target: "Lengkap", type: "select", options: ["Tidak ada", "Tidak lengkap", "Kurang lengkap", "Lengkap"] },
+            { id: "m_si_1", cluster: 1, sub: "SI", name: "RME", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_si_2", cluster: 1, sub: "SI", name: "Website", target: "Ada", type: "boolean", options: ["Ada", "Tidak ada"] },
+            { id: "m_si_3", cluster: 1, sub: "SI", name: "Tim Pengelola SI", target: "Ditetapkan", type: "boolean", options: ["Ditetapkan", "Tidak ditetapkan"] },
+            { id: "m_si_4", cluster: 1, sub: "SI", name: "Profil Puskesmas", target: "Disusun", type: "boolean", options: ["Disusun", "Tidak disusun"] },
+            { id: "m_si_5", cluster: 1, sub: "SI", name: "Laporan Program", target: "Tiap bulan", type: "select", options: [">= 6 bulan", "4-5 bulan", "2-3 bulan", "Tiap bulan"] },
+            { id: "m_si_6", cluster: 1, sub: "SI", name: "Penyebarluasan Data", target: "Dilaksanakan", type: "boolean", options: ["Dilaksanakan", "Tidak dilaksanakan"] },
+            { id: "m_si_7", cluster: 1, sub: "SI", name: "Laporan Program ke DKK", target: "Dilaksanakan", type: "boolean", options: ["Dilaksanakan", "Tidak dilaksanakan"] },
+            { id: "m_jej_1", cluster: 1, sub: "Jejaring", name: "Pertemuan Rutin", target: "100%", type: "percent", unit: "%" },
+            { id: "m_pem_1", cluster: 1, sub: "Pemberdayaan", name: "Desa Siaga", target: ">=15%", type: "percent", unit: "%" },
+            { id: "m_pem_2", cluster: 1, sub: "Pemberdayaan", name: "RTS (PHBS)", target: ">=84%", type: "percent", unit: "%" },
+            { id: "m_pem_3", cluster: 1, sub: "Pemberdayaan", name: "Desa PHBS/Germas", target: ">=20%", type: "percent", unit: "%" },
+            { id: "m_pem_4", cluster: 1, sub: "Pemberdayaan", name: "Posyandu Aktif", target: "100%", type: "percent", unit: "%" },
+            { id: "m_pem_5", cluster: 1, sub: "Pemberdayaan", name: "Tema Edukasi", target: ">=10", type: "select", options: ["<5", "5-7", "8-9", ">=10"] },
+            { id: "m_pem_6", cluster: 1, sub: "Pemberdayaan", name: "Pembinaan Pos UKK", target: "Membina + entry SITKO", type: "select", options: ["Tidak membina", "Membina sebagian", "Membina + tidak entry SITKO", "Membina + entry SITKO"] },
+            { id: "m_pem_7", cluster: 1, sub: "Pemberdayaan", name: "Tatanan KTR", target: "40%", type: "percent", unit: "%" },
+            { id: "m_pem_8", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pendataan", target: "100%", type: "percent", unit: "%" },
+            { id: "m_pem_9", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pembinaan", target: "100%", type: "percent", unit: "%" },
+            { id: "m_pem_10", cluster: 1, sub: "Pemberdayaan", name: "Kepesertaan JKN Aktif", target: ">90%", type: "percent", unit: "%" },
+            { id: "k2_placeholder", cluster: 2, sub: "KIA", name: "Capaian Ibu Hamil K4", target: "100%", type: "percent", unit: "%" },
+            { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
+            { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
+            { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
+            { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
+        ];
+
+        const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        let isEditMode = false;
+        let selectedMonth = new Date().getMonth();
+        let selectedYear = new Date().getFullYear().toString();
+        let indicatorsData = {};
+        let activeEditId = null;
+        let tempEditValue = "";
+        let chartInstance = null;
+        let currentChartRange = '12';
+
+        window.onload = () => {
+            setupSelectors();
+            initChart();
+            renderKlasterCards();
+            updateAll();
+            DatabaseService.init();
+            window.addEventListener('scroll', () => document.getElementById('main-header').classList.toggle('nav-scrolled', window.scrollY > 10));
+        };
+
+        function setupSelectors() {
+            const mSelect = document.getElementById('select-month');
+            const ySelect = document.getElementById('select-year');
+            MONTHS.forEach((m, i) => mSelect.innerHTML += `<option value="${i}" ${i === selectedMonth ? 'selected' : ''}>${m}</option>`);
+            // ["2023", "2024", "2025"].forEach(y => ySelect.innerHTML += `<option value="${y}" ${y === selectedYear ? 'selected' : ''}>${y}</option>`);
+            const startYear = 2025;
+            const currentYear = new Date().getFullYear();
+            for (let y = startYear; y <= currentYear; y++) {
+                ySelect.innerHTML += `<option value="${y}" ${y.toString() === selectedYear ? 'selected' : ''}>${y}</option>`;
+            }
+            mSelect.onchange = (e) => { selectedMonth = parseInt(e.target.value); updateAll(); };
+            ySelect.onchange = (e) => { selectedYear = e.target.value; updateAll(); };
+            document.getElementById('btn-edit').onclick = () => setEditMode(true);
+            document.getElementById('btn-view').onclick = () => setEditMode(false);
+        }
+
+        function setEditMode(val) {
+            isEditMode = val;
+            const btnV = document.getElementById('btn-view');
+            const btnE = document.getElementById('btn-edit');
+            btnV.className = val ? "px-4 md:px-6 py-2 rounded-xl text-xs font-black text-slate-500 hover:text-blue-600 transition-all flex items-center gap-2" : "px-4 md:px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm transition-all flex items-center gap-2";
+            btnE.className = val ? "px-4 md:px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm transition-all flex items-center gap-2" : "px-4 md:px-6 py-2 rounded-xl text-xs font-black text-slate-500 hover:text-blue-600 transition-all flex items-center gap-2";
+            KLASTER_CONFIG.forEach(k => renderIndicatorItems(k.id));
+        }
+
+        /**
+         * LOGIKA FALLBACK CERDAS
+         * Jika bulan terpilih kosong, cari ke bulan-bulan sebelumnya.
+         */
+        function getDataObj(id, month = selectedMonth, year = selectedYear) {
+            const indicator = indicatorsData[id];
+            if (!indicator || !indicator[year]) return null;
+
+            // Jika ada data di bulan spesifik, kembalikan itu
+            if (indicator[year][month]) return indicator[year][month];
+
+            // Jika kosong, cari ke bulan-bulan sebelumnya (Fallback)
+            for (let m = month - 1; m >= 0; m--) {
+                if (indicator[year][m]) {
+                    return { ...indicator[year][m], isFallback: true, fallbackFrom: MONTHS[m] };
+                }
+            }
+            return null;
+        }
+
+        function getAchievement(id, month = selectedMonth, year = selectedYear) {
+            const data = getDataObj(id, month, year);
+            return data ? data.value : "0";
+        }
+
+        function getTimestamp(id, month = selectedMonth, year = selectedYear) {
+            const data = getDataObj(id, month, year);
+            if (!data) return "Belum ada data";
+            if (data.isFallback) return `Data terakhir: ${data.fallbackFrom} ${year}`;
+            return `Update: ${data.lastUpdated}`;
+        }
+
+        function checkStatus(item, ach) {
+            const t = item.target.toLowerCase();
+            const a = ach.toString().toLowerCase();
+            if (item.type === "boolean" || item.type === "select") return a === t ? "Tercapai" : "Belum";
+            const tNum = parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+            const aNum = parseFloat(a.replace(/[^0-9.]/g, '')) || 0;
+            if (t.startsWith(">=")) return aNum >= tNum ? "Tercapai" : "Belum";
+            if (t.startsWith(">")) return aNum > tNum ? "Tercapai" : "Belum";
+            return aNum >= tNum ? "Tercapai" : "Belum";
+        }
+
+        function updateAll() {
+            renderStats();
+            KLASTER_CONFIG.forEach(k => renderIndicatorItems(k.id));
+            updateChart();
+        }
+
+        function renderStats() {
+            let achieved = 0;
+            const total = RAW_INDICATORS.length;
+            RAW_INDICATORS.forEach(item => { if (checkStatus(item, getAchievement(item.id)) === "Tercapai") achieved++; });
+            document.getElementById('stat-avg').textContent = Math.round((achieved / total) * 100) + "%";
+            document.getElementById('stat-achieved').textContent = achieved;
+            document.getElementById('stat-progress-bar').style.width = (achieved / total * 100) + "%";
+        }
+
+        function renderKlasterCards() {
+            const container = document.getElementById('klaster-container');
+            container.innerHTML = '';
+            KLASTER_CONFIG.forEach(klaster => {
+                container.innerHTML += `
+                    <div id="cluster-${klaster.id}" class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden transition-all">
+                        <button onclick="toggleCluster(${klaster.id})" class="w-full px-8 py-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-2xl bg-${klaster.color}-600 flex items-center justify-center text-white text-sm font-black">${klaster.icon}</div>
+                                <div class="text-left">
+                                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide">Klaster ${klaster.id}: ${klaster.name}</h3>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${RAW_INDICATORS.filter(i => i.cluster === klaster.id).length} Indikator</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-slate-300 chevron-icon transition-transform"></i>
+                        </button>
+                        <div class="cluster-content">
+                            <div class="px-8 pb-4">
+                                <input type="text" oninput="renderIndicatorItems(${klaster.id})" id="search-cluster-${klaster.id}" placeholder="Cari indikator..." class="w-full px-5 py-3 bg-slate-50 border-none rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-100">
+                            </div>
+                            <div id="indicators-list-${klaster.id}" class="divide-y divide-slate-50 border-t border-slate-50"></div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function toggleCluster(id) {
+            document.getElementById(`cluster-${id}`).classList.toggle('cluster-active');
+            renderIndicatorItems(id);
+        }
+
+        function renderIndicatorItems(clusterId) {
+            const list = document.getElementById(`indicators-list-${clusterId}`);
+            if (!list) return;
+            const query = (document.getElementById(`search-cluster-${clusterId}`)?.value || "").toLowerCase();
+            list.innerHTML = '';
+
+            RAW_INDICATORS.filter(i => i.cluster === clusterId && (i.name.toLowerCase().includes(query) || i.sub.toLowerCase().includes(query)))
+                .forEach(item => {
+                    const ach = getAchievement(item.id);
+                    const ts = getTimestamp(item.id);
+                    const isTercapai = checkStatus(item, ach) === "Tercapai";
+                    const isFallback = getDataObj(item.id)?.isFallback;
+
+                    list.innerHTML += `
+                        <div class="p-5 md:px-8 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="text-xs font-bold text-slate-700 truncate">${item.name}</h5>
+                                    <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[8px] font-black uppercase tracking-tighter">${item.sub}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Target: ${item.target}</span>
+                                    <span class="text-[10px] font-black ${isTercapai ? 'text-emerald-500' : 'text-rose-400'}">● ${ach}${item.unit || ''}</span>
+                                    <span class="text-[9px] font-bold ${isFallback ? 'text-blue-400 bg-blue-50 px-1 rounded' : 'text-slate-300'} uppercase">
+                                        <i class="far fa-clock mr-1"></i>${ts}
+                                    </span>
+                                </div>
+                            </div>
+                            ${isEditMode ? `<button onclick="openEditor('${item.id}')" class="shrink-0 w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg text-xs hover:bg-blue-600 transition-all shadow-md"><i class="fas fa-edit"></i></button>` : ''}
+                        </div>`;
+                });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ label: 'Capaian %', data: [], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', borderWidth: 3, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#fff' }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', padding: 12, displayColors: false } },
+                    scales: {
+                        y: { min: 0, max: 100, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8', callback: (v) => v + '%' }, grid: { borderDash: [5, 5], color: '#f1f5f9' } },
+                        x: { ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            let labels = []; let data = [];
+            const total = RAW_INDICATORS.length;
+            if (currentChartRange === '12') {
+                labels = MONTHS;
+                MONTHS.forEach((_, m) => {
+                    let acc = 0;
+                    RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, m, selectedYear)) === "Tercapai") acc++; });
+                    data.push(Math.round((acc / total) * 100));
+                });
+            } else {
+                const curY = parseInt(selectedYear);
+                for (let y = curY - 4; y <= curY; y++) {
+                    labels.push(y.toString());
+                    let acc = 0;
+                    // Rata-rata per tahun (diambil dari Desember tahun tersebut)
+                    RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, 11, y.toString())) === "Tercapai") acc++; });
+                    data.push(Math.round((acc / total) * 100));
+                }
+            }
+            chartInstance.data.labels = labels;
+            chartInstance.data.datasets[0].data = data;
+            chartInstance.update();
+        }
+
+        function changeChartRange(range) {
+            currentChartRange = range;
+            document.getElementById('range-12').className = range === '12' ? "flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm transition-all uppercase tracking-widest" : "flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest";
+            document.getElementById('range-60').className = range === '60' ? "flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm transition-all uppercase tracking-widest" : "flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest";
+            updateChart();
+        }
+
+        window.openEditor = (id) => {
+            activeEditId = id;
+            const item = RAW_INDICATORS.find(i => i.id === id);
+            // Saat edit, ambil nilai asli bulan ini, bukan fallback
+            const existing = indicatorsData[id]?.[selectedYear]?.[selectedMonth];
+            tempEditValue = existing ? existing.value : getAchievement(id);
+
+            document.getElementById('modal-name').textContent = item.name;
+            document.getElementById('modal-sub').textContent = `${MONTHS[selectedMonth]} ${selectedYear} • Target: ${item.target}`;
+            const area = document.getElementById('modal-input-area');
+
+            if (item.type === "boolean") {
+                area.innerHTML = `<div class="flex gap-2 p-1 bg-slate-100 rounded-2xl">${item.options.map(opt => `<button onclick="setTemp('${opt}')" class="flex-1 py-6 rounded-xl font-black ${tempEditValue === opt ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}" id="opt-${opt}">${opt.toUpperCase()}</button>`).join('')}</div>`;
+            } else if (item.type === "select") {
+                area.innerHTML = `<div class="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-2">${item.options.map(opt => `<button onclick="setTemp('${opt}')" class="w-full py-4 px-4 rounded-xl font-bold text-xs text-left transition-all ${tempEditValue === opt ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 text-slate-500'}" data-opt="${opt}">${opt}</button>`).join('')}</div>`;
+            } else {
+                area.innerHTML = `<div class="relative"><input type="number" id="m-input-val" value="${tempEditValue}" class="w-full p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 text-center text-3xl font-black text-blue-600 outline-none focus:border-blue-400"><span class="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300">${item.unit || ''}</span></div>`;
+            }
+            document.getElementById('edit-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('modal-container').classList.remove('translate-y-full'), 50);
+        };
+
+        window.setTemp = (v) => {
+            tempEditValue = v;
+            const item = RAW_INDICATORS.find(i => i.id === activeEditId);
+            if (item.type === "boolean") {
+                item.options.forEach(opt => document.getElementById(`opt-${opt}`).className = `flex-1 py-6 rounded-xl font-black ${v === opt ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`);
+            } else if (item.type === "select") {
+                document.querySelectorAll('[data-opt]').forEach(btn => btn.className = `w-full py-4 px-4 rounded-xl font-bold text-xs text-left transition-all ${v === btn.getAttribute('data-opt') ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 text-slate-500'}`);
+            }
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal-container').classList.add('translate-y-full');
+            setTimeout(() => document.getElementById('edit-modal').classList.add('hidden'), 300);
+        };
+
+        window.saveData = () => {
+            const item = RAW_INDICATORS.find(i => i.id === activeEditId);
+            const val = (item.type === "boolean" || item.type === "select") ? tempEditValue : document.getElementById('m-input-val').value;
+            const ts = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+
+            // Simpan Ke Local State
+            if (!indicatorsData[activeEditId]) indicatorsData[activeEditId] = {};
+            if (!indicatorsData[activeEditId][selectedYear]) indicatorsData[activeEditId][selectedYear] = {};
+
+            indicatorsData[activeEditId][selectedYear][selectedMonth] = {
+                value: val,
+                lastUpdated: ts
+            };
+
+            DatabaseService.updateIndicator(activeEditId, selectedYear, selectedMonth, val);
+            closeModal();
+            updateAll();
+        };
+    </script>
+</body>
+
+</html>

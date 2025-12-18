@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM-PKP RTDB Interface</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .custom-shadow { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05); }
+        details summary::-webkit-details-marker { display: none; }
+        .chart-container { position: relative; height: 350px; width: 100%; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900">
+
+    <div class="max-w-7xl mx-auto px-4 py-8 md:px-8">
+        
+        <!-- Header & Nav -->
+        <nav class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-200">
+                        <i class="fas fa-chart-pie text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">SIM-PKP <span class="text-blue-600">CLOUD</span></h1>
+                </div>
+                <p class="text-slate-400 text-sm font-medium mt-1 uppercase tracking-wider">Antarmuka Firebase Realtime Database</p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white p-1.5 rounded-3xl shadow-sm border border-slate-200">
+                <button id="btn-view" class="px-6 py-2.5 rounded-2xl text-sm font-bold bg-blue-600 text-white shadow-md transition-all">
+                    <i class="fas fa-eye mr-2"></i>Monitoring
+                </button>
+                <button id="btn-edit" class="px-6 py-2.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
+                    <i class="fas fa-pen-to-square mr-2"></i>Update Data
+                </button>
+            </div>
+        </nav>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-blue-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-100 relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-blue-100 text-xs font-black uppercase tracking-widest mb-3 opacity-80">Rata-rata Capaian</p>
+                    <h2 id="stat-avg" class="text-6xl font-black tabular-nums">0%</h2>
+                    <div class="mt-4 flex items-center gap-2 text-blue-200 text-xs font-bold">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Berdasarkan data periode terpilih</span>
+                    </div>
+                </div>
+                <i class="fas fa-chart-line absolute -right-6 -bottom-6 text-white opacity-10 text-[12rem] group-hover:scale-110 transition-transform duration-700"></i>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-3">Indikator Tercapai</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-achieved" class="text-6xl font-black text-emerald-500 tabular-nums">0</span>
+                        <span id="stat-total" class="text-2xl font-bold text-slate-300">/ 0</span>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full mt-6 overflow-hidden">
+                    <div id="stat-progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-1000 rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
+                <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-3">Periode Pelaporan</p>
+                <div class="space-y-4">
+                    <select id="select-month" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-100 transition-all cursor-pointer">
+                        <!-- Options generated by JS -->
+                    </select>
+                    <select id="select-year" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-100 transition-all cursor-pointer">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 mb-12 overflow-hidden">
+            <div class="p-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-amber-50 p-3 rounded-2xl">
+                        <i class="fas fa-bolt text-amber-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-800">Visualisasi Tren</h3>
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-tighter">Analisis fluktuasi kinerja bulanan</p>
+                    </div>
+                </div>
+                <div class="flex bg-slate-100 p-1.5 rounded-2xl">
+                    <button onclick="changeChartView('1Y')" id="chart-btn-1y" class="px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm transition-all">1 Tahun</button>
+                    <button onclick="changeChartView('5Y')" id="chart-btn-5y" class="px-6 py-2 rounded-xl text-xs font-black text-slate-500 transition-all">5 Tahun</button>
+                </div>
+            </div>
+            <div class="p-8 pt-4">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-8 flex flex-col md:flex-row gap-4">
+            <div class="flex-1 relative group">
+                <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors"></i>
+                <input type="text" id="search-input" placeholder="Cari nama indikator..." class="w-full pl-16 pr-8 py-5 bg-white border border-slate-200 rounded-[2rem] outline-none focus:ring-4 focus:ring-blue-50 transition-all font-semibold">
+            </div>
+            <select id="filter-cluster" class="bg-white px-8 py-5 border border-slate-200 rounded-[2rem] font-bold text-slate-700 outline-none cursor-pointer min-w-[240px]">
+                <option value="all">Semua Klaster</option>
+            </select>
+        </div>
+
+        <!-- Indicators Container -->
+        <div id="indicators-list" class="space-y-6">
+            <!-- Dynamic Content via JS -->
+        </div>
+
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-[3.5rem] shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modal-container">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                <h4 class="text-xl font-black text-slate-800 tracking-tight">Update Capaian</h4>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-900 bg-white shadow-sm p-3 rounded-full w-12 h-12 flex items-center justify-center transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-10 text-center">
+                <p id="modal-cluster" class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2"></p>
+                <h5 id="modal-name" class="text-2xl font-black text-slate-800 leading-tight mb-8 px-4"></h5>
+                
+                <div id="modal-input-area" class="mb-10">
+                    <!-- Dynamic Input via JS -->
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="closeModal()" class="py-5 font-black text-slate-400 uppercase tracking-widest text-xs">Batalkan</button>
+                    <button onclick="saveData()" class="py-5 bg-blue-600 text-white font-black rounded-3xl shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all text-xs uppercase tracking-widest">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- MASTER CONFIG & MOCK DATA ---
+        const MASTER_INDICATORS = [
+            { id: "manajemen_5th", cluster: "1. Klaster 1: Manajemen", name: "Mempunyai Rencana Lima Tahunan", target: "Punya", unit: "" },
+            { id: "manajemen_ruk", cluster: "1. Klaster 1: Manajemen", name: "Menyusun RUK", target: ">=75%", unit: "%" },
+            { id: "hipertensi_skrining", cluster: "3. Klaster 3: Dewasa & Lansia", name: "Skrining Hipertensi", target: "100%", unit: "%" },
+            { id: "imunisasi_dasar", cluster: "2. Klaster 2: Ibu dan Anak", name: "Imunisasi Dasar Lengkap", target: "95%", unit: "%" }
+        ];
+
+        const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const YEARS = ["2023", "2024", "2025"];
+
+        // --- APP STATE ---
+        let isEditMode = false;
+        let selectedMonth = new Date().getMonth();
+        let selectedYear = "2025";
+        let chartInstance = null;
+        let chartMode = '1Y';
+        let activeEditId = null;
+        let tempEditValue = "";
+
+        // Simulasi data lokal (Anda akan menggantinya dengan Firebase RTDB)
+        let indicatorsData = {}; 
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            setupUI();
+            updateDashboard();
+        };
+
+        function setupUI() {
+            // Fill Selects
+            const mSelect = document.getElementById('select-month');
+            const ySelect = document.getElementById('select-year');
+            const cSelect = document.getElementById('filter-cluster');
+
+            MONTHS.forEach((m, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = m;
+                if(i === selectedMonth) opt.selected = true;
+                mSelect.appendChild(opt);
+            });
+
+            YEARS.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if(y === selectedYear) opt.selected = true;
+                ySelect.appendChild(opt);
+            });
+
+            const clusters = [...new Set(MASTER_INDICATORS.map(i => i.cluster))].sort();
+            clusters.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                cSelect.appendChild(opt);
+            });
+
+            // Listeners
+            mSelect.onchange = (e) => { selectedMonth = parseInt(e.target.value); updateDashboard(); };
+            ySelect.onchange = (e) => { selectedYear = e.target.value; updateDashboard(); };
+            document.getElementById('search-input').oninput = updateDashboard;
+            document.getElementById('filter-cluster').onchange = updateDashboard;
+            document.getElementById('btn-edit').onclick = () => setEditMode(true);
+            document.getElementById('btn-view').onclick = () => setEditMode(false);
+        }
+
+        // --- LOGIC ---
+
+        function setEditMode(val) {
+            isEditMode = val;
+            const btnV = document.getElementById('btn-view');
+            const btnE = document.getElementById('btn-edit');
+
+            if(val) {
+                btnE.className = "px-6 py-2.5 rounded-2xl text-sm font-bold bg-blue-600 text-white shadow-md transition-all";
+                btnV.className = "px-6 py-2.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-blue-600 transition-all";
+            } else {
+                btnV.className = "px-6 py-2.5 rounded-2xl text-sm font-bold bg-blue-600 text-white shadow-md transition-all";
+                btnE.className = "px-6 py-2.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-blue-600 transition-all";
+            }
+            updateDashboard();
+        }
+
+        function getAchievement(id, year, month) {
+            // Simulasi pengambilan data - Anda akan menggunakan firebase.database() di sini
+            const history = indicatorsData[id]?.[year];
+            if(history && history[month] !== undefined) return history[month];
+            return "0";
+        }
+
+        function checkStatus(target, achievement) {
+            const t = target.toLowerCase();
+            const a = achievement.toString().toLowerCase();
+            if(t.includes("punya")) return a === "punya" ? "Tercapai" : "Belum Tercapai";
+            const tVal = parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+            const aVal = parseFloat(a.replace(/[^0-9.]/g, '')) || 0;
+            return aVal >= tVal ? "Tercapai" : "Belum Tercapai";
+        }
+
+        function updateDashboard() {
+            renderStats();
+            renderChart();
+            renderIndicators();
+        }
+
+        function renderStats() {
+            let achieved = 0;
+            let total = MASTER_INDICATORS.length;
+            let sum = 0;
+
+            MASTER_INDICATORS.forEach(item => {
+                const val = getAchievement(item.id, selectedYear, selectedMonth);
+                if(checkStatus(item.target, val) === "Tercapai") achieved++;
+                sum += (val === "Punya" ? 100 : (parseFloat(val) || 0));
+            });
+
+            const avg = (sum / total).toFixed(1);
+            document.getElementById('stat-avg').textContent = avg + "%";
+            document.getElementById('stat-achieved').textContent = achieved;
+            document.getElementById('stat-total').textContent = "/ " + total;
+            document.getElementById('stat-progress-bar').style.width = (achieved / total * 100) + "%";
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const labels = chartMode === '1Y' ? MONTHS.map(m => m.slice(0, 3)) : YEARS;
+            
+            // Mock Data for UI
+            const data = chartMode === '1Y' 
+                ? [65, 68, 75, 81, 80, 85, 88, 87, 89, 92, 91, 94]
+                : [70, 82, 94];
+
+            if(chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Skor Kinerja (%)',
+                        data: data,
+                        borderColor: '#2563eb',
+                        borderWidth: 4,
+                        backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563eb',
+                        pointBorderWidth: 3,
+                        pointRadius: chartMode === '1Y' ? 5 : 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        function changeChartView(mode) {
+            chartMode = mode;
+            document.getElementById('chart-btn-1y').className = mode === '1Y' ? "px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm" : "px-6 py-2 rounded-xl text-xs font-black text-slate-500";
+            document.getElementById('chart-btn-5y').className = mode === '5Y' ? "px-6 py-2 rounded-xl text-xs font-black bg-white text-blue-600 shadow-sm" : "px-6 py-2 rounded-xl text-xs font-black text-slate-500";
+            renderChart();
+        }
+
+        function renderIndicators() {
+            const list = document.getElementById('indicators-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const cluster = document.getElementById('filter-cluster').value;
+            
+            list.innerHTML = '';
+
+            const grouped = {};
+            MASTER_INDICATORS.forEach(item => {
+                if(cluster !== 'all' && item.cluster !== cluster) return;
+                if(!item.name.toLowerCase().includes(search)) return;
+                if(!grouped[item.cluster]) grouped[item.cluster] = [];
+                grouped[item.cluster].push(item);
+            });
+
+            if(Object.keys(grouped).length === 0) {
+                list.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-slate-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</div>`;
+                return;
+            }
+
+            Object.entries(grouped).sort().forEach(([cName, items]) => {
+                const details = document.createElement('details');
+                details.open = (search !== "" || cluster !== "all");
+                details.className = "group bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm";
+                
+                let cardsHtml = items.map(item => {
+                    const ach = getAchievement(item.id, selectedYear, selectedMonth);
+                    const status = checkStatus(item.target, ach);
+                    const isTercapai = status === "Tercapai";
+                    
+                    return `
+                        <div class="bg-slate-50/50 p-7 rounded-[2rem] border border-slate-100 hover:border-blue-200 hover:bg-white transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-6">
+                                    <span class="px-3 py-1 text-[9px] font-black uppercase tracking-wider rounded-full ${isTercapai ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">${status}</span>
+                                    <i class="fas ${isTercapai ? 'fa-check-circle text-emerald-400' : 'fa-info-circle text-slate-300'}"></i>
+                                </div>
+                                <h5 class="font-bold text-slate-800 leading-tight mb-8 h-12 line-clamp-2">${item.name}</h5>
+                                <div class="space-y-3 mb-6">
+                                    <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase">
+                                        <span>Target</span>
+                                        <span>${item.target}</span>
+                                    </div>
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-[10px] font-black text-blue-400 uppercase">Capaian</span>
+                                        <span class="text-3xl font-black text-blue-600">${ach}${item.unit}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            ${isEditMode ? `<button onclick="openEditor('${item.id}')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs hover:bg-blue-600 transition-all active:scale-95">UPDATE DATA</button>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                details.innerHTML = `
+                    <summary class="p-8 flex justify-between items-center cursor-pointer list-none hover:bg-slate-50 transition-all">
+                        <div class="flex items-center gap-5">
+                            <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-slate-800 text-lg">${cName}</h4>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${items.length} Indikator</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-300 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="p-8 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${cardsHtml}
+                    </div>
+                `;
+                list.appendChild(details);
+            });
+        }
+
+        // --- MODAL & DATA SAVING ---
+
+        window.openEditor = (id) => {
+            activeEditId = id;
+            const item = MASTER_INDICATORS.find(i => i.id === id);
+            const ach = getAchievement(id, selectedYear, selectedMonth);
+            tempEditValue = ach;
+
+            document.getElementById('modal-cluster').textContent = item.cluster;
+            document.getElementById('modal-name').textContent = item.name;
+            
+            const area = document.getElementById('modal-input-area');
+            if(item.target === "Punya") {
+                area.innerHTML = `
+                    <div class="flex gap-4 p-2 bg-slate-100 rounded-[2rem]">
+                        <button id="m-btn-punya" onclick="setTemp('Punya')" class="flex-1 py-10 rounded-[1.5rem] font-black text-xl transition-all ${ach === 'Punya' ? 'bg-white text-blue-600 shadow-xl' : 'text-slate-400'}">Punya</button>
+                        <button id="m-btn-tidak" onclick="setTemp('Tidak Punya')" class="flex-1 py-10 rounded-[1.5rem] font-black text-xl transition-all ${ach !== 'Punya' ? 'bg-white text-blue-600 shadow-xl' : 'text-slate-400'}">Tidak</button>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `
+                    <div class="relative">
+                        <input type="text" id="m-input-val" class="w-full p-8 bg-slate-50 border-4 border-slate-100 rounded-[2.5rem] text-5xl font-black text-blue-600 text-center focus:border-blue-500 outline-none transition-all" value="${ach}">
+                        <span class="absolute right-10 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300">${item.unit}</span>
+                    </div>
+                `;
+            }
+
+            const modal = document.getElementById('edit-modal');
+            const container = document.getElementById('modal-container');
+            modal.classList.remove('hidden');
+            setTimeout(() => container.classList.replace('opacity-0', 'opacity-100'), 10);
+            setTimeout(() => container.classList.replace('scale-95', 'scale-100'), 10);
+        };
+
+        window.setTemp = (v) => {
+            tempEditValue = v;
+            const p = document.getElementById('m-btn-punya');
+            const t = document.getElementById('m-btn-tidak');
+            if(v === 'Punya') {
+                p.className = "flex-1 py-10 bg-white shadow-xl text-blue-600 rounded-[1.5rem] font-black text-xl transition-all";
+                t.className = "flex-1 py-10 text-slate-400 rounded-[1.5rem] font-black text-xl transition-all";
+            } else {
+                t.className = "flex-1 py-10 bg-white shadow-xl text-blue-600 rounded-[1.5rem] font-black text-xl transition-all";
+                p.className = "flex-1 py-10 text-slate-400 rounded-[1.5rem] font-black text-xl transition-all";
+            }
+        };
+
+        window.closeModal = () => {
+            const modal = document.getElementById('edit-modal');
+            const container = document.getElementById('modal-container');
+            container.classList.replace('scale-100', 'scale-95');
+            container.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        window.saveData = () => {
+            const item = MASTER_INDICATORS.find(i => i.id === activeEditId);
+            const val = item.target === "Punya" ? tempEditValue : document.getElementById('m-input-val').value;
+            
+            // Simpan ke State Lokal
+            if(!indicatorsData[activeEditId]) indicatorsData[activeEditId] = {};
+            if(!indicatorsData[activeEditId][selectedYear]) indicatorsData[activeEditId][selectedYear] = Array(12).fill(null);
+            
+            indicatorsData[activeEditId][selectedYear][selectedMonth] = val;
+
+            // LOGIKA FIREBASE RTDB:
+            // Sesuai janji, Anda yang akan menyambungkannya. Contoh:
+            // firebase.database().ref(`indicators/${activeEditId}/${selectedYear}/${selectedMonth}`).set(val);
+
+            closeModal();
+            updateDashboard();
+        };
+
+    </script>
+</body>
+</html>

@@ -2,11 +2,140 @@
 <html lang="en">
 
 <head>
-    <insert-template-head />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Tool Not Found | Web DM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .pulse {
+            animation: pulse-wave 2s infinite;
+        }
+
+        @keyframes pulse-wave {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+        }
+
+        /* Custom Brand Green */
+        .text-brand-green {
+            color: #09a248;
+        }
+
+        .bg-brand-green {
+            background-color: #09a248;
+        }
+
+        .border-brand-green {
+            border-color: #09a248;
+        }
+
+        .hover\:bg-brand-green-dark:hover {
+            background-color: #078a3d;
+        }
+    </style>
 </head>
 
-<body>
-    <insert-content-404 />
+<body class="min-h-screen flex flex-col text-slate-900">
+
+    <header
+        class="bg-white/90 backdrop-blur-md border-b border-slate-200 py-4 px-8 flex justify-between items-center relative z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-green rounded-lg flex items-center justify-center text-white shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.51 4.05 3 5.5l7 7Z" />
+                </svg>
+            </div>
+            <h1 class="text-lg font-bold text-slate-900 leading-none">Web DM</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-6 text-center">
+        <div class="relative mb-12">
+            <!-- Subtle background text -->
+            <div class="text-[10rem] font-extrabold text-slate-100 leading-none select-none">404</div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="pulse text-brand-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                        <path d="M9 9h6" />
+                        <path d="M9 13h6" />
+                        <path d="M9 17h6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Utility Not Located</h2>
+        <p class="text-slate-500 text-lg max-w-md mb-10 leading-relaxed">
+            The screening tool, calculator, or tracker you are looking for isn't here. It might have been relocated to a
+            different module in the Web DM hub.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="index.html"
+                class="bg-brand-green hover:bg-brand-green-dark text-white font-bold py-4 px-10 rounded-xl transition-all hover:scale-105 shadow-lg shadow-green-200 flex items-center gap-2">
+                Return to Hub
+            </a>
+            <button onclick="window.history.back()"
+                class="bg-white border border-slate-200 text-slate-600 font-bold py-4 px-10 rounded-xl hover:bg-slate-50 transition-all">
+                Go Back
+            </button>
+        </div>
+
+        <div class="mt-12 grid grid-cols-3 gap-4 opacity-30">
+            <div class="flex flex-col items-center text-xs font-bold text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+                CALC
+            </div>
+            <div class="flex flex-col items-center text-xs font-bold text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+                    <path d="M12 20v-6M6 20V10M18 20V4" />
+                </svg>
+                TRACK
+            </div>
+            <div class="flex flex-col items-center text-xs font-bold text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                SCREEN
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-8 px-8 text-center text-slate-400 text-xs uppercase tracking-widest">
+        Utility Hub Status: Error 404
+    </footer>
+
 </body>
 
 </html>

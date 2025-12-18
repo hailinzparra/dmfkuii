@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Web DM FK UII." />
+    <meta name="static-version" content="v0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Web DM FK UII" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="black" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+        integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <title>Logbook Indikator Puskesmas Sukodono</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
+        integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets/js/defines.js"></script>
+    <script src="/assets/js/utils.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script defer src="/__/firebase/12.5.0/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/12.5.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <script defer src="/assets/js/main.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-7xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900 mb-2">
+                Logbook Indikator Puskesmas Sukodono
+            </h1>
+            <p class="text-lg text-gray-600">
+                Visualisasi Capaian Indikator 5 Klaster (Data Bulanan)
+            </p>
+        </header>
+
+        <!-- Ringkasan Global -->
+        <div id="summary-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"></div>
+
+        <!-- Filter Kontrol -->
+        <div class="mb-8 p-4 bg-white shadow-md rounded-xl flex flex-col sm:flex-row gap-4">
+            <input type="text" id="search-input" placeholder="Cari indikator..."
+                class="w-full sm:flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+            <select id="cluster-filter"
+                class="w-full sm:w-1/4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="all">Semua Klaster</option>
+            </select>
+            <select id="status-filter"
+                class="w-full sm:w-1/4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="all">Semua Status</option>
+                <option value="Tercapai">Tercapai</option>
+                <option value="Belum Tercapai">Belum Tercapai</option>
+            </select>
+        </div>
+
+        <!-- Dashboard Konten -->
+        <div id="dashboard-content" class="space-y-10"></div>
+
+        <footer class="mt-12 text-center text-sm text-gray-400 p-4 border-t">
+            <p>&copy; 2025 Puskesmas Sukodono. Diperbarui secara manual berdasarkan input laporan bulanan.</p>
+        </footer>
+    </div>
+
+    <script>
+        const indicators = [
+            // KLASTER 1: MANAJEMEN
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "A. Manajemen Inti", name: "Punya Rencana Lima Tahunan", target: "Punya", unit: "", mockAchievement: "Punya" },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "A. Manajemen Inti", name: "Menyusun RUK", target: ">75%", unit: "", mockAchievement: "100%" },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "A. Manajemen Inti", name: "Menyusun RPK", target: "Ya", unit: "", mockAchievement: "Ya" },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "A. Manajemen Inti", name: "Melaksanakan mini lokakarya bulanan", target: "9-12", unit: "kali/tahun", mockAchievement: 12 },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "A. Manajemen Inti", name: "Melaksanakan mini lokakarya tribulan", target: "4", unit: "kali/tahun", mockAchievement: 4 },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "B. Manajemen Mutu", name: "Kepatuhan Petugas terhadap SOP", target: ">= 90%", unit: "", mockAchievement: "90%" },
+            { cluster: "1. Klaster 1: Manajemen", subCategory: "B. Manajemen Mutu", name: "Indeks Kepuasan Masyarakat", target: ">80%", unit: "", mockAchievement: "90%" },
+
+            // KLASTER 2: IBU DAN ANAK
+            { cluster: "2. Klaster 2: Ibu dan Anak", subCategory: "", name: "Ibu Hamil ANC 6", target: "100%", unit: "", mockAchievement: "100%" },
+
+            // KLASTER 3: USIA DEWASA DAN LANSIA
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Obesitas", target: "100%", unit: "%", mockAchievement: 100 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Hipertensi", target: "100%", unit: "%", mockAchievement: 100 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining DM", target: "100%", unit: "%", mockAchievement: 100 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Jantung", target: "90%", unit: "%", mockAchievement: 90 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Stroke", target: "90%", unit: "%", mockAchievement: 90 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining PPOK", target: "90%", unit: "%", mockAchievement: 90 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Kanker Payudara", target: "90%", unit: "%", mockAchievement: 90 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Kanker Serviks", target: "90%", unit: "%", mockAchievement: 90 },
+            { cluster: "3. Klaster 3: Usia Dewasa dan Lansia", name: "Skrining Indera", target: "90%", unit: "%", mockAchievement: 90 },
+
+            // KLASTER 5: LINTAS KLASTER
+            { cluster: "4. Klaster 5: Lintas Klaster", subCategory: "A. Gigi dan Mulut", name: "Cakupan layanan pada klaster 2", target: "25%", unit: "", mockAchievement: "25%" },
+            { cluster: "4. Klaster 5: Lintas Klaster", subCategory: "A. Gigi dan Mulut", name: "Cakupan layanan pada klaster 3", target: "25%", unit: "", mockAchievement: "25%" },
+            { cluster: "4. Klaster 5: Lintas Klaster", subCategory: "B. Gawat Darurat", name: "Cakupan layanan tanpa dirujuk", target: "80%", unit: "", mockAchievement: "85%" },
+            { cluster: "4. Klaster 5: Lintas Klaster", subCategory: "C. Perkesmas", name: "Pelayanan Keluarga Rawan", target: "100%", unit: "%", mockAchievement: 100 },
+
+            // GABUNGAN
+            {
+                cluster: "5. Gabungan",
+                name: "Cakupan pelayanan kasus TB",
+                target: "100%",
+                unit: "",
+                mockAchievement: "100%",
+                details: [
+                    { label: "Anak", value: "12 Kasus" },
+                    { label: "Ibu Hamil", value: "2 Kasus" },
+                    { label: "Dewasa", value: "45 Kasus" }
+                ]
+            },
+            {
+                cluster: "5. Gabungan",
+                name: "Cakupan pelayanan kasus HIV",
+                target: "100%",
+                unit: "",
+                mockAchievement: "100%",
+                details: [
+                    { label: "Total Kasus Terintegrasi", value: "8 Kasus" }
+                ]
+            },
+            {
+                cluster: "5. Gabungan",
+                name: "Cakupan pelayanan kasus ODGJ",
+                target: "100%",
+                unit: "",
+                mockAchievement: "90%",
+                details: [
+                    { label: "Total Kasus Terpantau", value: "24 Kasus" }
+                ]
+            }
+        ];
+
+        function determineStatus(targetStr, achievement) {
+            const t = targetStr.toString().toLowerCase();
+            const a = achievement.toString().toLowerCase();
+
+            if (t.includes("punya") || t.includes("ya")) {
+                return a === t ? 'Tercapai' : 'Belum Tercapai';
+            }
+
+            const tVal = parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+            const aVal = parseFloat(a.replace(/[^0-9.]/g, '')) || 0;
+
+            if (t.includes('>=')) return aVal >= tVal ? 'Tercapai' : 'Belum Tercapai';
+            if (t.includes('>')) return aVal > tVal ? 'Tercapai' : 'Belum Tercapai';
+            if (t.includes('-')) {
+                const range = t.split('-').map(v => parseFloat(v));
+                return (aVal >= range[0] && aVal <= range[1]) ? 'Tercapai' : 'Belum Tercapai';
+            }
+
+            return aVal >= tVal ? 'Tercapai' : 'Belum Tercapai';
+        }
+
+        function renderDashboard(data) {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = '';
+
+            if (data.length === 0) {
+                content.innerHTML = '<div class="text-center py-20 text-gray-400">Tidak ada indikator yang sesuai dengan filter.</div>';
+                return;
+            }
+
+            const clustered = data.reduce((acc, item) => {
+                if (!acc[item.cluster]) acc[item.cluster] = [];
+                acc[item.cluster].push(item);
+                return acc;
+            }, {});
+
+            Object.keys(clustered).sort().forEach(clusterName => {
+                const section = document.createElement('section');
+                section.className = 'mb-12';
+
+                section.innerHTML = `
+                    <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                        <span class="w-2 h-8 bg-blue-600 rounded mr-3"></span>
+                        ${clusterName}
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${clustered[clusterName].map(item => {
+                    const status = determineStatus(item.target, item.mockAchievement);
+                    const isTercapai = status === 'Tercapai';
+
+                    return `
+                                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition">
+                                    <div>
+                                        ${item.subCategory ? `<span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">${item.subCategory}</span>` : ''}
+                                        <h3 class="text-gray-800 font-bold text-lg mb-4 leading-tight">${item.name}</h3>
+                                        
+                                        <div class="space-y-2 mb-4">
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-500">Target</span>
+                                                <span class="font-semibold text-gray-700">${item.target} ${item.unit}</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-500">Capaian</span>
+                                                <span class="font-extrabold text-blue-600">${item.mockAchievement} ${item.unit}</span>
+                                            </div>
+                                        </div>
+
+                                        ${item.details ? `
+                                            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Rincian Kasus:</p>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    ${item.details.map(d => `
+                                                        <div class="text-xs">
+                                                            <span class="text-gray-500">${d.label}:</span>
+                                                            <span class="font-bold text-gray-700">${d.value}</span>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <div class="mt-2 py-2 rounded-lg text-center font-bold text-sm ${isTercapai ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                        ${status}
+                                    </div>
+                                </div>
+                            `;
+                }).join('')}
+                    </div>
+                `;
+                content.appendChild(section);
+            });
+        }
+
+        function renderSummary() {
+            const summary = document.getElementById('summary-cards');
+            const total = indicators.length;
+            const achieved = indicators.filter(i => determineStatus(i.target, i.mockAchievement) === 'Tercapai').length;
+            const rate = ((achieved / total) * 100).toFixed(1);
+
+            summary.innerHTML = `
+                <div class="bg-blue-600 p-6 rounded-2xl text-white shadow-lg">
+                    <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">Total Indikator</p>
+                    <p class="text-4xl font-black mt-1">${total}</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">Tercapai</p>
+                    <p class="text-4xl font-black text-green-600 mt-1">${achieved}</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">Belum Tercapai</p>
+                    <p class="text-4xl font-black text-red-500 mt-1">${total - achieved}</p>
+                </div>
+                <div class="bg-indigo-700 p-6 rounded-2xl text-white shadow-lg">
+                    <p class="text-indigo-100 text-sm font-medium uppercase tracking-wider">Persentase Kinerja</p>
+                    <p class="text-4xl font-black mt-1">${rate}%</p>
+                </div>
+            `;
+        }
+
+        function init() {
+            const clusterFilter = document.getElementById('cluster-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const searchInput = document.getElementById('search-input');
+            const clusters = [...new Set(indicators.map(i => i.cluster))].sort();
+
+            clusters.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                clusterFilter.appendChild(opt);
+            });
+
+            const filterHandler = () => {
+                const search = searchInput.value.toLowerCase();
+                const cluster = clusterFilter.value;
+                const status = statusFilter.value;
+
+                const filtered = indicators.filter(i => {
+                    const currentStatus = determineStatus(i.target, i.mockAchievement);
+                    const matchesSearch = i.name.toLowerCase().includes(search);
+                    const matchesCluster = cluster === 'all' || i.cluster === cluster;
+                    const matchesStatus = status === 'all' || currentStatus === status;
+                    return matchesSearch && matchesCluster && matchesStatus;
+                });
+                renderDashboard(filtered);
+            };
+
+            clusterFilter.addEventListener('change', filterHandler);
+            statusFilter.addEventListener('change', filterHandler);
+            searchInput.addEventListener('input', filterHandler);
+
+            renderDashboard(indicators);
+            renderSummary();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
