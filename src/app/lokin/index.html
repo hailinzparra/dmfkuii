@@ -148,8 +148,8 @@
             <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
                 <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Indikator Tercapai</p>
                 <div class="flex items-baseline gap-2">
-                    <span id="stat-achieved" class="text-4xl font-black text-emerald-500 tabular-nums">0</span>
-                    <span id="stat-total" class="text-xl font-bold text-slate-300">/ 56</span>
+                    <span id="stat-achieved" class="text-4xl font-black text-emerald-500 tabular-nums">-</span>
+                    <span id="stat-total" class="text-xl font-bold text-slate-300">/ -</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
                     <div id="stat-progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-1000"></div>
@@ -374,7 +374,7 @@
             { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Contoh: Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
             { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Contoh: Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
             { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Contoh: Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
-            // { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Contoh: Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
+            // { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Contoh: Capaian Layanan ODGJ", target: "100%", type: "percent", unit: "%" }
         ];
 
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -480,6 +480,7 @@
             RAW_INDICATORS.forEach(item => { if (checkStatus(item, getAchievement(item.id)) === "Tercapai") achieved++; });
             document.getElementById('stat-avg').textContent = Math.round((achieved / total) * 100) + "%";
             document.getElementById('stat-achieved').textContent = achieved;
+            document.getElementById('stat-total').textContent = "/ " + total;
             document.getElementById('stat-progress-bar').style.width = (achieved / total * 100) + "%";
         }
 
