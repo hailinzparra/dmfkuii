@@ -6,39 +6,25 @@
     "categories": [
         "productivity"
     ],
-    "id": "/",
-    "scope": "/",
-    "start_url": "/",
+    "id": "/lokin/",
+    "scope": "/lokin/",
+    "start_url": "/lokin/",
     "display": "standalone",
     "orientation": "natural",
     "theme_color": "#f8fafc",
     "background_color": "#f8fafc",
     "icons": [
         {
-            "src": "/assets/images/favicon.png",
+            "src": "/assets/images/lokin/favicon.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any"
         },
         {
-            "src": "/assets/images/favicon.png",
+            "src": "/assets/images/lokin/favicon.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "/assets/images/ss-narrow-1.png",
-            "type": "image/png",
-            "sizes": "540x720",
-            "form_factor": "narrow"
-        },
-        {
-            "src": "/assets/images/ss-wide-1.png",
-            "type": "image/png",
-            "sizes": "720x420",
-            "form_factor": "wide"
         }
     ]
 }
