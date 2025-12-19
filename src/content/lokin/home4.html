@@ -66,44 +66,10 @@
             height: 300px;
             width: 100%;
         }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        /* Toast Animation */
-        #toast {
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            transform: translateY(100px);
-            opacity: 0;
-        }
-
-        #toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
     </style>
 </head>
 
 <body class="bg-[#f8fafc] text-slate-900">
-
-    <!-- Feedback Toast -->
-    <div id="toast"
-        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 pointer-events-none">
-        <div id="toast-icon" class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
-            <i class="fas fa-check text-[10px]"></i>
-        </div>
-        <span id="toast-msg" class="text-xs font-bold tracking-wide">Data berhasil diperbarui</span>
-    </div>
 
     <header id="main-header" class="sticky-nav">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-4">
@@ -134,7 +100,7 @@
     </header>
 
     <div class="max-w-7xl mx-auto px-4 pb-12 md:px-8">
-        <!-- Stats Row -->
+        <!-- Stats Overview -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-lg relative overflow-hidden group">
                 <div class="relative z-10">
@@ -164,7 +130,7 @@
             </div>
         </div>
 
-        <!-- Chart Section -->
+        <!-- Performa Chart Section -->
         <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-6 mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-2">
                 <div>
@@ -186,17 +152,17 @@
             </div>
         </div>
 
-        <!-- Clusters -->
+        <!-- Klaster List -->
         <div id="klaster-container" class="space-y-4"></div>
 
         <!-- Footer -->
         <footer class="mt-5 pt-10 px-8 flex flex-row justify-between items-center border-t border-slate-200 gap-4">
             <!-- <div> -->
-            <img src="/assets/images/kspr/logo-fkuii-pkm.png" alt="Logo FK UII dan Puskesmas Sukodono"
-                style="width: 100%; max-width: 200px;">
-            <div class="flex gap-6 justify-center text-[6px] font-bold text-slate-400 uppercase tracking-widest">
-                <span class="flex items-center gap-1 mt-2">made by imad</span>
-            </div>
+                <img src="/assets/images/kspr/logo-fkuii-pkm.png" alt="Logo FK UII dan Puskesmas Sukodono"
+                    style="width: 100%; max-width: 200px;">
+                <div class="flex gap-6 justify-center text-[6px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span class="flex items-center gap-1 mt-2">made by imad</span>
+                </div>
             <!-- </div> -->
         </footer>
     </div>
@@ -208,16 +174,11 @@
             id="modal-container">
             <div class="p-6 border-b border-slate-50 flex justify-between items-center">
                 <span class="text-xs font-black text-blue-500 uppercase tracking-widest">Update Capaian</span>
-                <div class="flex gap-2">
-                    <button id="modal-trash-btn" onclick="openDeleteMenu()"
-                        class="hidden w-10 h-10 flex items-center justify-center bg-rose-50 rounded-full text-rose-500 hover:bg-rose-100 transition-colors"><i
-                            class="fas fa-trash-can"></i></button>
-                    <button onclick="closeModal()"
-                        class="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200"><i
-                            class="fas fa-times"></i></button>
-                </div>
+                <button onclick="closeModal()"
+                    class="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200"><i
+                        class="fas fa-times"></i></button>
             </div>
-            <div class="p-8 text-center" id="modal-main-view">
+            <div class="p-8 text-center">
                 <h5 id="modal-name" class="text-xl font-black text-slate-800 mb-2"></h5>
                 <p id="modal-sub" class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-8"></p>
                 <div id="modal-input-area" class="mb-10"></div>
@@ -225,29 +186,8 @@
                     <button onclick="closeModal()"
                         class="flex-1 py-4 font-black text-slate-400 text-xs uppercase tracking-widest">Batal</button>
                     <button onclick="saveData()"
-                        class="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl shadow-lg text-xs uppercase tracking-widest hover:bg-blue-700 transition-all">Simpan
+                        class="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl shadow-lg text-xs uppercase tracking-widest">Simpan
                         Perubahan</button>
-                </div>
-            </div>
-
-            <!-- Delete Menu Subview -->
-            <div class="p-8 text-center hidden" id="modal-delete-view">
-                <div
-                    class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-trash-can text-xl"></i>
-                </div>
-                <h5 class="text-xl font-black text-slate-800 mb-2">Hapus Data?</h5>
-                <p class="text-xs font-bold text-slate-400 mb-8 leading-relaxed">Pilih cakupan data yang ingin Anda
-                    hapus untuk indikator ini.</p>
-                <div class="space-y-3">
-                    <button onclick="deleteAction('month')"
-                        class="w-full py-4 bg-slate-100 text-slate-700 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Hapus
-                        Bulan Ini Saja</button>
-                    <button onclick="confirmDeleteAll()"
-                        class="w-full py-4 bg-rose-50 text-rose-600 font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-rose-100 transition-all">Hapus
-                        Seluruh Riwayat</button>
-                    <button onclick="backFromDelete()"
-                        class="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest mt-2">Batal</button>
                 </div>
             </div>
         </div>
@@ -256,58 +196,42 @@
     <script>
         /**
          * ==========================================
-         * PLACEHOLDER DATABASE SERVICE
+         * INTERFACE DATABASE (REVISED LOGIC)
          * ==========================================
          */
         const DatabaseService = {
             db: null,
-            // PATH Struktur: lokin_puskesmas/indicators/{indicatorId}/{year}/{month}
-            basePath: "lokin_puskesmas/indicators",
-
             init: function () {
+                // firebase.initializeApp(firebaseConfig);
                 this.db = firebase.database();
-                console.log("DatabaseService: Menunggu implementasi Firebase...");
-                this.listenToAllData();
+                this.loadAllData();
             },
-
-            listenToAllData: function () {
-                const ref = this.db.ref(this.basePath);
-                ref.on('value', (snapshot) => {
-                    indicatorsData = snapshot.val() || {};
-                    updateAll();
+            loadAllData: function () {
+                this.db.ref('indicators_data').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        indicatorsData = data;
+                        updateAll();
+                    }
                 });
-                console.log("DatabaseService: Placeholder listener aktif.");
             },
-
             updateIndicator: function (indicatorId, year, month, value) {
-                const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                const dataToSave = {
+                const timestamp = new Date().toLocaleString('id-ID', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                });
+                const payload = {
                     value: value,
                     lastUpdated: timestamp
                 };
-
-                this.db.ref(`${this.basePath}/${indicatorId}/${year}/${month}`).set(dataToSave);
-                console.log(`DatabaseService: Menyimpan ke [${this.basePath}/${indicatorId}/${year}/${month}]`, dataToSave);
-
-                // Fallback In-Memory (Hapus jika Firebase sudah aktif)
-                if (!indicatorsData[indicatorId]) indicatorsData[indicatorId] = {};
-                if (!indicatorsData[indicatorId][year]) indicatorsData[indicatorId][year] = {};
-                indicatorsData[indicatorId][year][month] = dataToSave;
-            },
-
-            deleteIndicator: function (indicatorId, year, month, scope) {
-                let path = (scope === 'all') ? `${this.basePath}/${indicatorId}` : `${this.basePath}/${indicatorId}/${year}/${month}`;
-                this.db.ref(path).remove();
-                console.log(`DatabaseService: Menghapus path [${scope}] untuk ${indicatorId}`);
-
-                // Fallback In-Memory
-                if (scope === 'all') {
-                    delete indicatorsData[indicatorId];
-                } else if (indicatorsData[indicatorId]?.[year]) {
-                    delete indicatorsData[indicatorId][year][month];
-                }
+                console.log(`Menyimpan ke indicators_data/${indicatorId}/${year}/${month}:`, payload);
+                this.db.ref(`indicators_data/${indicatorId}/${year}/${month}`).set(payload)
             }
         };
+
+        // ==========================================
+        // DATA & FRONT END LOGIC
+        // ==========================================
 
         const KLASTER_CONFIG = [
             { id: 1, name: "Manajemen", color: "blue", icon: "1" },
@@ -315,9 +239,10 @@
             { id: 3, name: "Dewasa dan Lansia", color: "emerald", icon: "3" },
             { id: 4, name: "Penyakit Menular", color: "amber", icon: "4" },
             { id: 5, name: "Lintas Klaster", color: "purple", icon: "5" },
-            { id: 6, name: "Gabungan", color: "slate", icon: "6" }
+            // { id: 6, name: "Gabungan", color: "slate", icon: "6" }
         ];
 
+        // Definisi 56 Indikator
         const RAW_INDICATORS = [
             { id: "m_inti_1", cluster: 1, sub: "Inti", name: "Rencana Lima Tahunan", target: "Punya", type: "boolean", options: ["Punya", "Tidak Punya"] },
             { id: "m_inti_2", cluster: 1, sub: "Inti", name: "Menyusun RUK", target: ">=75%", type: "percent", unit: "%" },
@@ -370,11 +295,11 @@
             { id: "m_pem_8", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pendataan", target: "100%", type: "percent", unit: "%" },
             { id: "m_pem_9", cluster: 1, sub: "Pemberdayaan", name: "Hatra: Pembinaan", target: "100%", type: "percent", unit: "%" },
             { id: "m_pem_10", cluster: 1, sub: "Pemberdayaan", name: "Kepesertaan JKN Aktif", target: ">90%", type: "percent", unit: "%" },
-            { id: "k2_placeholder", cluster: 2, sub: "KIA", name: "Capaian Ibu Hamil K4", target: "100%", type: "percent", unit: "%" },
-            { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
-            { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
-            { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
-            { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
+            { id: "k2_placeholder", cluster: 2, sub: "KIA", name: "Contoh: Capaian Ibu Hamil K4", target: "100%", type: "percent", unit: "%" },
+            { id: "k3_placeholder", cluster: 3, sub: "Lansia", name: "Contoh: Skrining Kesehatan Lansia", target: "100%", type: "percent", unit: "%" },
+            { id: "k4_placeholder", cluster: 4, sub: "P2P", name: "Contoh: Capaian Imunisasi Dasar", target: "100%", type: "percent", unit: "%" },
+            { id: "k5_placeholder", cluster: 5, sub: "Lintas", name: "Contoh: Kesehatan Lingkungan Sekolah", target: "100%", type: "percent", unit: "%" },
+            // { id: "k6_placeholder", cluster: 6, sub: "Gabungan", name: "Indeks Kepuasan Pengguna", target: "100%", type: "percent", unit: "%" }
         ];
 
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -386,7 +311,6 @@
         let tempEditValue = "";
         let chartInstance = null;
         let currentChartRange = '12';
-        let clusterFilters = {};
 
         window.onload = () => {
             setupSelectors();
@@ -396,19 +320,6 @@
             DatabaseService.init();
             window.addEventListener('scroll', () => document.getElementById('main-header').classList.toggle('nav-scrolled', window.scrollY > 10));
         };
-
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            const toastIcon = document.getElementById('toast-icon');
-
-            toastMsg.textContent = msg;
-            toastIcon.className = `w-6 h-6 rounded-full flex items-center justify-center ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`;
-            toastIcon.innerHTML = type === 'success' ? '<i class="fas fa-check text-[10px]"></i>' : '<i class="fas fa-trash-can text-[10px]"></i>';
-
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
 
         function setupSelectors() {
             const mSelect = document.getElementById('select-month');
@@ -435,12 +346,22 @@
             KLASTER_CONFIG.forEach(k => renderIndicatorItems(k.id));
         }
 
+        /**
+         * LOGIKA FALLBACK CERDAS
+         * Jika bulan terpilih kosong, cari ke bulan-bulan sebelumnya.
+         */
         function getDataObj(id, month = selectedMonth, year = selectedYear) {
             const indicator = indicatorsData[id];
             if (!indicator || !indicator[year]) return null;
+
+            // Jika ada data di bulan spesifik, kembalikan itu
             if (indicator[year][month]) return indicator[year][month];
+
+            // Jika kosong, cari ke bulan-bulan sebelumnya (Fallback)
             for (let m = month - 1; m >= 0; m--) {
-                if (indicator[year][m]) return { ...indicator[year][m], isFallback: true, fallbackFrom: MONTHS[m] };
+                if (indicator[year][m]) {
+                    return { ...indicator[year][m], isFallback: true, fallbackFrom: MONTHS[m] };
+                }
             }
             return null;
         }
@@ -487,7 +408,6 @@
             const container = document.getElementById('klaster-container');
             container.innerHTML = '';
             KLASTER_CONFIG.forEach(klaster => {
-                clusterFilters[klaster.id] = 'all';
                 container.innerHTML += `
                     <div id="cluster-${klaster.id}" class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden transition-all">
                         <button onclick="toggleCluster(${klaster.id})" class="w-full px-8 py-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
@@ -501,32 +421,13 @@
                             <i class="fas fa-chevron-down text-slate-300 chevron-icon transition-transform"></i>
                         </button>
                         <div class="cluster-content">
-                            <div class="px-8 pb-4 space-y-3">
+                            <div class="px-8 pb-4">
                                 <input type="text" oninput="renderIndicatorItems(${klaster.id})" id="search-cluster-${klaster.id}" placeholder="Cari indikator..." class="w-full px-5 py-3 bg-slate-50 border-none rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-100">
-                                <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                                    <button onclick="setStatusFilter(${klaster.id}, 'all')" id="filter-${klaster.id}-all" class="shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-blue-600 text-white shadow-sm">Semua</button>
-                                    <button onclick="setStatusFilter(${klaster.id}, 'tercapai')" id="filter-${klaster.id}-tercapai" class="shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-slate-100 text-slate-400">Tercapai</button>
-                                    <button onclick="setStatusFilter(${klaster.id}, 'belum')" id="filter-${klaster.id}-belum" class="shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-slate-100 text-slate-400">Belum</button>
-                                </div>
                             </div>
                             <div id="indicators-list-${klaster.id}" class="divide-y divide-slate-50 border-t border-slate-50"></div>
                         </div>
                     </div>`;
             });
-        }
-
-        function setStatusFilter(clusterId, status) {
-            clusterFilters[clusterId] = status;
-            ['all', 'tercapai', 'belum'].forEach(type => {
-                const btn = document.getElementById(`filter-${clusterId}-${type}`);
-                if (type === status) {
-                    let c = 'bg-blue-600'; if (status === 'tercapai') c = 'bg-emerald-500'; if (status === 'belum') c = 'bg-rose-500';
-                    btn.className = `shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${c} text-white shadow-sm`;
-                } else {
-                    btn.className = `shrink-0 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-slate-100 text-slate-400 hover:bg-slate-200`;
-                }
-            });
-            renderIndicatorItems(clusterId);
         }
 
         function toggleCluster(id) {
@@ -538,55 +439,33 @@
             const list = document.getElementById(`indicators-list-${clusterId}`);
             if (!list) return;
             const query = (document.getElementById(`search-cluster-${clusterId}`)?.value || "").toLowerCase();
-            const filterStatus = clusterFilters[clusterId] || 'all';
             list.innerHTML = '';
 
-            const filteredItems = RAW_INDICATORS.filter(item => {
-                const matchesSearch = item.cluster === clusterId && (item.name.toLowerCase().includes(query) || item.sub.toLowerCase().includes(query));
-                if (!matchesSearch) return false;
-                const ach = getAchievement(item.id);
-                const isTercapai = checkStatus(item, ach) === "Tercapai";
-                if (filterStatus === 'tercapai') return isTercapai;
-                if (filterStatus === 'belum') return !isTercapai;
-                return true;
-            });
+            RAW_INDICATORS.filter(i => i.cluster === clusterId && (i.name.toLowerCase().includes(query) || i.sub.toLowerCase().includes(query)))
+                .forEach(item => {
+                    const ach = getAchievement(item.id);
+                    const ts = getTimestamp(item.id);
+                    const isTercapai = checkStatus(item, ach) === "Tercapai";
+                    const isFallback = getDataObj(item.id)?.isFallback;
 
-            if (filteredItems.length === 0) {
-                list.innerHTML = `
-                    <div class="py-12 px-8 text-center bg-slate-50/50">
-                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm text-slate-200">
-                            <i class="fas fa-filter-circle-xmark text-lg"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tidak ada indikator ditemukan</p>
-                        <p class="text-[9px] font-bold text-slate-300 uppercase mt-1">Coba sesuaikan pencarian atau filter status Anda</p>
-                    </div>
-                `;
-                return;
-            }
-
-            filteredItems.forEach(item => {
-                const ach = getAchievement(item.id);
-                const ts = getTimestamp(item.id);
-                const isTercapai = checkStatus(item, ach) === "Tercapai";
-                const isFallback = getDataObj(item.id)?.isFallback;
-                list.innerHTML += `
-                    <div class="p-5 md:px-8 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <h5 class="text-xs font-bold text-slate-700 truncate">${item.name}</h5>
-                                <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[8px] font-black uppercase tracking-tighter">${item.sub}</span>
+                    list.innerHTML += `
+                        <div class="p-5 md:px-8 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="text-xs font-bold text-slate-700 truncate">${item.name}</h5>
+                                    <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[8px] font-black uppercase tracking-tighter">${item.sub}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Target: ${item.target}</span>
+                                    <span class="text-[10px] font-black ${isTercapai ? 'text-emerald-500' : 'text-rose-400'}">● ${ach}${item.unit || ''}</span>
+                                    <span class="text-[9px] font-bold ${isFallback ? 'text-blue-400 bg-blue-50 px-1 rounded' : 'text-slate-300'} uppercase">
+                                        <i class="far fa-clock mr-1"></i>${ts}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                                <span class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Target: ${item.target}</span>
-                                <span class="text-[10px] font-black ${isTercapai ? 'text-emerald-500' : 'text-rose-400'}">● ${ach}${item.unit || ''}</span>
-                                <span class="text-[9px] font-bold ${isFallback ? 'text-blue-400 bg-blue-50 px-1 rounded' : 'text-slate-300'} uppercase">
-                                    <i class="far fa-clock mr-1"></i>${ts}
-                                </span>
-                            </div>
-                        </div>
-                        ${isEditMode ? `<button onclick="openEditor('${item.id}')" class="shrink-0 w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg text-xs hover:bg-blue-600 transition-all shadow-md"><i class="fas fa-edit"></i></button>` : ''}
-                    </div>`;
-            });
+                            ${isEditMode ? `<button onclick="openEditor('${item.id}')" class="shrink-0 w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg text-xs hover:bg-blue-600 transition-all shadow-md"><i class="fas fa-edit"></i></button>` : ''}
+                        </div>`;
+                });
         }
 
         function initChart() {
@@ -595,18 +474,39 @@
                 type: 'line',
                 data: { labels: [], datasets: [{ label: 'Capaian %', data: [], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', borderWidth: 3, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#fff' }] },
                 options: {
-                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', padding: 12, displayColors: false } },
-                    scales: { y: { min: 0, max: 100, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8', callback: (v) => v + '%' }, grid: { borderDash: [5, 5], color: '#f1f5f9' } }, x: { ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' }, grid: { display: false } } }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', padding: 12, displayColors: false } },
+                    scales: {
+                        y: { min: 0, max: 100, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8', callback: (v) => v + '%' }, grid: { borderDash: [5, 5], color: '#f1f5f9' } },
+                        x: { ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' }, grid: { display: false } }
+                    }
                 }
             });
         }
 
         function updateChart() {
-            let labels = []; let data = []; const total = RAW_INDICATORS.length;
+            let labels = []; let data = [];
+            const total = RAW_INDICATORS.length;
             if (currentChartRange === '12') {
-                labels = MONTHS; MONTHS.forEach((_, m) => { let acc = 0; RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, m, selectedYear)) === "Tercapai") acc++; }); data.push(Math.round((acc / total) * 100)); });
-            } else { const curY = parseInt(selectedYear); for (let y = curY - 4; y <= curY; y++) { labels.push(y.toString()); let acc = 0; RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, 11, y.toString())) === "Tercapai") acc++; }); data.push(Math.round((acc / total) * 100)); } }
-            chartInstance.data.labels = labels; chartInstance.data.datasets[0].data = data; chartInstance.update();
+                labels = MONTHS;
+                MONTHS.forEach((_, m) => {
+                    let acc = 0;
+                    RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, m, selectedYear)) === "Tercapai") acc++; });
+                    data.push(Math.round((acc / total) * 100));
+                });
+            } else {
+                const curY = parseInt(selectedYear);
+                for (let y = curY - 4; y <= curY; y++) {
+                    labels.push(y.toString());
+                    let acc = 0;
+                    // Rata-rata per tahun (diambil dari Desember tahun tersebut)
+                    RAW_INDICATORS.forEach(i => { if (checkStatus(i, getAchievement(i.id, 11, y.toString())) === "Tercapai") acc++; });
+                    data.push(Math.round((acc / total) * 100));
+                }
+            }
+            chartInstance.data.labels = labels;
+            chartInstance.data.datasets[0].data = data;
+            chartInstance.update();
         }
 
         function changeChartRange(range) {
@@ -619,13 +519,10 @@
         window.openEditor = (id) => {
             activeEditId = id;
             const item = RAW_INDICATORS.find(i => i.id === id);
-            const actualData = indicatorsData[id]?.[selectedYear]?.[selectedMonth];
-            tempEditValue = actualData ? actualData.value : getAchievement(id);
+            // Saat edit, ambil nilai asli bulan ini, bukan fallback
+            const existing = indicatorsData[id]?.[selectedYear]?.[selectedMonth];
+            tempEditValue = existing ? existing.value : getAchievement(id);
 
-            document.getElementById('modal-trash-btn').classList.toggle('hidden', !actualData && !indicatorsData[id]);
-
-            document.getElementById('modal-main-view').classList.remove('hidden');
-            document.getElementById('modal-delete-view').classList.add('hidden');
             document.getElementById('modal-name').textContent = item.name;
             document.getElementById('modal-sub').textContent = `${MONTHS[selectedMonth]} ${selectedYear} • Target: ${item.target}`;
             const area = document.getElementById('modal-input-area');
@@ -635,7 +532,7 @@
             } else if (item.type === "select") {
                 area.innerHTML = `<div class="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-2">${item.options.map(opt => `<button onclick="setTemp('${opt}')" class="w-full py-4 px-4 rounded-xl font-bold text-xs text-left transition-all ${tempEditValue === opt ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 text-slate-500'}" data-opt="${opt}">${opt}</button>`).join('')}</div>`;
             } else {
-                area.innerHTML = `<div class="relative"><input type="number" id="m-input-val" value="${tempEditValue}" class="w-full p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 text-center text-3xl font-black text-blue-600 outline-none focus:border-blue-400" onkeydown="if(event.key==='Enter') saveData()"><span class="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300">${item.unit || ''}</span></div>`;
+                area.innerHTML = `<div class="relative"><input type="number" id="m-input-val" value="${tempEditValue}" class="w-full p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 text-center text-3xl font-black text-blue-600 outline-none focus:border-blue-400"><span class="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300">${item.unit || ''}</span></div>`;
             }
             document.getElementById('edit-modal').classList.remove('hidden');
             setTimeout(() => document.getElementById('modal-container').classList.remove('translate-y-full'), 50);
@@ -644,8 +541,11 @@
         window.setTemp = (v) => {
             tempEditValue = v;
             const item = RAW_INDICATORS.find(i => i.id === activeEditId);
-            if (item.type === "boolean") { item.options.forEach(opt => document.getElementById(`opt-${opt}`).className = `flex-1 py-6 rounded-xl font-black ${v === opt ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`); }
-            else if (item.type === "select") { document.querySelectorAll('[data-opt]').forEach(btn => btn.className = `w-full py-4 px-4 rounded-xl font-bold text-xs text-left transition-all ${v === btn.getAttribute('data-opt') ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 text-slate-500'}`); }
+            if (item.type === "boolean") {
+                item.options.forEach(opt => document.getElementById(`opt-${opt}`).className = `flex-1 py-6 rounded-xl font-black ${v === opt ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`);
+            } else if (item.type === "select") {
+                document.querySelectorAll('[data-opt]').forEach(btn => btn.className = `w-full py-4 px-4 rounded-xl font-bold text-xs text-left transition-all ${v === btn.getAttribute('data-opt') ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 text-slate-500'}`);
+            }
         };
 
         window.closeModal = () => {
@@ -655,55 +555,22 @@
 
         window.saveData = () => {
             const item = RAW_INDICATORS.find(i => i.id === activeEditId);
-            const valInput = document.getElementById('m-input-val');
-            const val = (item.type === "boolean" || item.type === "select") ? tempEditValue : valInput.value;
+            const val = (item.type === "boolean" || item.type === "select") ? tempEditValue : document.getElementById('m-input-val').value;
             const ts = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
 
+            // Simpan Ke Local State
             if (!indicatorsData[activeEditId]) indicatorsData[activeEditId] = {};
             if (!indicatorsData[activeEditId][selectedYear]) indicatorsData[activeEditId][selectedYear] = {};
 
-            indicatorsData[activeEditId][selectedYear][selectedMonth] = { value: val, lastUpdated: ts };
+            indicatorsData[activeEditId][selectedYear][selectedMonth] = {
+                value: val,
+                lastUpdated: ts
+            };
 
             DatabaseService.updateIndicator(activeEditId, selectedYear, selectedMonth, val);
             closeModal();
             updateAll();
-            showToast("Data berhasil diperbarui");
         };
-
-        window.openDeleteMenu = () => {
-            document.getElementById('modal-main-view').classList.add('hidden');
-            document.getElementById('modal-delete-view').classList.remove('hidden');
-        };
-
-        window.backFromDelete = () => {
-            document.getElementById('modal-delete-view').classList.add('hidden');
-            document.getElementById('modal-main-view').classList.remove('hidden');
-        };
-
-        window.deleteAction = (scope) => {
-            if (scope === 'month') {
-                if (indicatorsData[activeEditId]?.[selectedYear]) {
-                    delete indicatorsData[activeEditId][selectedYear][selectedMonth];
-                }
-                DatabaseService.deleteIndicator(activeEditId, selectedYear, selectedMonth, 'month');
-                finishDelete();
-            }
-        };
-
-        window.confirmDeleteAll = () => {
-            const confirm = window.confirm("Apakah Anda yakin ingin menghapus SELURUH riwayat data untuk indikator ini? Tindakan ini tidak dapat dibatalkan.");
-            if (confirm) {
-                delete indicatorsData[activeEditId];
-                DatabaseService.deleteIndicator(activeEditId, null, null, 'all');
-                finishDelete();
-            }
-        };
-
-        function finishDelete() {
-            closeModal();
-            updateAll();
-            showToast("Data berhasil dihapus", "delete");
-        }
     </script>
 </body>
 
